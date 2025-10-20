@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:flutter_contacts/flutter_contacts.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class StudentManagementView extends StatelessWidget {
   const StudentManagementView({super.key});
@@ -59,33 +61,50 @@ class StudentManagementView extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                         // Avatar section
-                        Row(
+                        Column(
                           children: [
-                            CircleAvatar(
-                              radius: 30,
-                              backgroundImage: (avatarURL?.isNotEmpty ?? false)
-                                  ? FileImage(File(avatarURL!))
-                                  : null,
-                              child: (avatarURL?.isEmpty ?? true)
-                                  ? const Icon(Icons.person, size: 30)
-                                  : null,
+                            Row(
+                              children: [
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage: (avatarURL?.isNotEmpty ?? false)
+                                      ? FileImage(File(avatarURL!))
+                                      : null,
+                                  child: (avatarURL?.isEmpty ?? true)
+                                      ? const Icon(Icons.person, size: 30)
+                                      : null,
+                                ),
+                                const SizedBox(width: 10),
+                                ElevatedButton.icon(
+                                  onPressed: () async {
+                                    final picker = ImagePicker();
+                                    final pickedFile = await picker.pickImage(source: ImageSource.camera);
+                                    if (pickedFile != null) {
+                                      final directory = await getApplicationDocumentsDirectory();
+                                      final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
+                                      final savedImage = await File(pickedFile.path).copy('${directory.path}/$fileName');
+                                      setState(() {
+                                        avatarURL = savedImage.path;
+                                      });
+                                    }
+                                  },
+                                  icon: const Icon(Icons.camera),
+                                  label: const Text('Take Photo'),
+                                ),
+                              ],
                             ),
-                            const SizedBox(width: 10),
+                            const SizedBox(height: 10),
                             ElevatedButton.icon(
                               onPressed: () async {
-                                final picker = ImagePicker();
-                                final pickedFile = await picker.pickImage(source: ImageSource.camera);
-                                if (pickedFile != null) {
-                                  final directory = await getApplicationDocumentsDirectory();
-                                  final fileName = '${DateTime.now().millisecondsSinceEpoch}.jpg';
-                                  final savedImage = await File(pickedFile.path).copy('${directory.path}/$fileName');
+                                await _pickContact(context, (name, phone) {
                                   setState(() {
-                                    avatarURL = savedImage.path;
+                                    fullNameController.text = name ?? '';
+                                    phoneController.text = phone ?? '';
                                   });
-                                }
+                                });
                               },
-                              icon: const Icon(Icons.camera),
-                              label: const Text('Take Photo'),
+                              icon: const Icon(Icons.contacts),
+                              label: const Text('Import from Contacts'),
                             ),
                           ],
                         ),
@@ -219,6 +238,49 @@ class StudentManagementView extends StatelessWidget {
         );
       },
     );
+  }
+
+  Future<void> _showPermissionDialog(BuildContext context) async {
+    await showDialog<void>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Permission Required'),
+        content: const Text('This app needs access to your contacts to import student information. Please grant permission in settings.'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(ctx).pop(),
+            child: const Text('Cancel'),
+          ),
+          ElevatedButton(
+            onPressed: () async {
+              Navigator.of(ctx).pop();
+              await openAppSettings();
+            },
+            child: const Text('Open Settings'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> _pickContact(BuildContext context, Function(String? name, String? phone) onSelected) async {
+    final status = await Permission.contacts.request();
+    if (status.isGranted) {
+      try {
+        final contact = await FlutterContacts.openExternalPick();
+        if (contact != null) {
+          final name = contact.displayName;
+          final phone = contact.phones.isNotEmpty ? contact.phones.first.number : null;
+          onSelected(name, phone);
+        }
+      } catch (e) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error picking contact: $e')),
+        );
+      }
+    } else {
+      await _showPermissionDialog(context);
+    }
   }
 
   @override
