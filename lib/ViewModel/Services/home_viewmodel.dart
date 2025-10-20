@@ -2,11 +2,11 @@ import '../../Model/student.dart';
 import '../../Model/major.dart';
 import 'base_viewmodel.dart';
 import 'package:student_management/Repository/student_repository.dart';
-import 'package:student_management/Data/Database/major_dao.dart';
+import 'package:student_management/Repository/major_repository.dart';
 
 class HomeViewModel extends BaseViewModel {
   final StudentRepository _repo = StudentRepository();
-  final MajorDao _majorDao = MajorDao();
+  final MajorRepository _majorRepo = MajorRepository();
   List<Student> _students = [];
   List<Major> _majors = [];
 
@@ -36,7 +36,7 @@ class HomeViewModel extends BaseViewModel {
   Future<void> _loadMajorsFromDb() async {
     // load majors but do not toggle the global loading state to avoid interfering with UI spinners
     try {
-      final list = await _majorDao.getAll();
+      final list = await _majorRepo.getAllMajors();
       _majors = list;
       clearError();
     } catch (e) {
@@ -94,6 +94,53 @@ class HomeViewModel extends BaseViewModel {
       final index = _students.indexWhere((s) => s.id == student.id);
       if (index != -1) {
         _students[index] = student;
+      }
+      clearError();
+    } catch (e) {
+      setError(e.toString());
+    }
+    setLoading(false);
+    notifyListeners();
+  }
+
+  Future<void> addMajor(Major major) async {
+    setLoading(true);
+    try {
+      final id = await _majorRepo.insertMajor(major);
+      final added = Major(
+        id: id,
+        majorName: major.majorName,
+        description: major.description,
+      );
+      _majors.add(added);
+      clearError();
+    } catch (e) {
+      setError(e.toString());
+    }
+    setLoading(false);
+    notifyListeners();
+  }
+
+  Future<void> removeMajor(String id) async {
+    setLoading(true);
+    try {
+      await _majorRepo.deleteMajor(id);
+      _majors.removeWhere((major) => major.id == id);
+      clearError();
+    } catch (e) {
+      setError(e.toString());
+    }
+    setLoading(false);
+    notifyListeners();
+  }
+
+  Future<void> updateMajor(Major major) async {
+    setLoading(true);
+    try {
+      await _majorRepo.updateMajor(major);
+      final index = _majors.indexWhere((m) => m.id == major.id);
+      if (index != -1) {
+        _majors[index] = major;
       }
       clearError();
     } catch (e) {

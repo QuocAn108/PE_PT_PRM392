@@ -19,6 +19,11 @@ class HomeView extends StatelessWidget {
             icon: const Icon(Icons.manage_accounts),
             onPressed: () => Navigator.pushNamed(context, AppRoutes.studentManage),
           ),
+          IconButton(
+            tooltip: 'Manage Majors',
+            icon: const Icon(Icons.school),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.majorManage),
+          ),
         ],
       ),
       body: Consumer<HomeViewModel>(
