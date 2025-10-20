@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'Utils/Routes/app_routes.dart';
-import 'ViewModel/home_viewmodel.dart';
+import 'ViewModel/Services/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

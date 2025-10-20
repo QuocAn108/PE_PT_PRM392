@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../ViewModel/home_viewmodel.dart';
+import '../ViewModel/Services/home_viewmodel.dart';
 import '../Model/student.dart';
 
 class HomeView extends StatelessWidget {
@@ -33,19 +33,22 @@ class HomeView extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    child: Text(student.name[0].toUpperCase()),
+                    child: Text(student.fullName.isNotEmpty ? student.fullName[0].toUpperCase() : '?'),
                   ),
-                  title: Text(student.name),
-                  subtitle: Text('${student.email}\n${student.phone}'),
+                  title: Text(student.fullName),
+                  subtitle: Text('${student.phoneNumber ?? ''}\nMajor: ${student.majorID}'),
                   isThreeLine: true,
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => viewModel.removeStudent(student.id),
+                    onPressed: () {
+                      if (student.id != null) {
+                        viewModel.removeStudent(student.id!);
+                      }
+                    },
                   ),
                   onTap: () {
-                    // Navigate to detail view (to be implemented)
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Selected: ${student.name}')),
+                      SnackBar(content: Text('Selected: ${student.fullName}')),
                     );
                   },
                 ),
@@ -56,13 +59,12 @@ class HomeView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add new student (mock)
           final viewModel = Provider.of<HomeViewModel>(context, listen: false);
           final newStudent = Student(
             id: DateTime.now().millisecondsSinceEpoch,
-            name: 'New Student ${viewModel.students.length + 1}',
-            email: 'new${viewModel.students.length + 1}@example.com',
-            phone: '0${viewModel.students.length + 1}00000000',
+            fullName: 'New Student ${viewModel.students.length + 1}',
+            majorID: 'SE18',
+            phoneNumber: '0${viewModel.students.length + 1}00000000',
           );
           viewModel.addStudent(newStudent);
         },
