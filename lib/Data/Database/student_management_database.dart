@@ -15,6 +15,7 @@ class StudentManagementDatabase extends BaseDatabase {
   Future<Database> initDatabase() async {
     String path = join(await getDatabasesPath(), databaseName);
     bool exists = await databaseExists(path);
+    bool copied = false;
 
     if (!exists) {
       // Copy prebuilt database from assets
@@ -22,6 +23,16 @@ class StudentManagementDatabase extends BaseDatabase {
       List<int> bytes = data.buffer.asUint8List(data.offsetInBytes, data.lengthInBytes);
       await File(path).create(recursive: true);
       await File(path).writeAsBytes(bytes, flush: true);
+      copied = true;
+    }
+
+    // If we copied the prebuilt DB from assets, do not provide onCreate (tables already exist)
+    if (copied) {
+      return await openDatabase(
+        path,
+        version: databaseVersion,
+        onUpgrade: onUpgrade,
+      );
     }
 
     return await openDatabase(
@@ -34,38 +45,8 @@ class StudentManagementDatabase extends BaseDatabase {
 
   @override
   Future<void> onCreate(Database db, int version) async {
-    // If you need to create tables dynamically when not using asset DB
-    await db.execute('''
-      CREATE TABLE Major (
-        Id TEXT PRIMARY KEY NOT NULL,
-        MajorName TEXT NOT NULL UNIQUE,
-        Description TEXT
-      );
-    ''');
-
-    await db.execute('''
-      CREATE TABLE Student (
-        Id INTEGER PRIMARY KEY,
-        FullName TEXT NOT NULL,
-        MajorID TEXT NOT NULL,
-        Address TEXT,
-        PhoneNumber TEXT,
-        AvatarURL TEXT,
-        Latitude REAL,
-        Longitude REAL,
-        FOREIGN KEY(MajorID) REFERENCES Major(Id)
-      );
-    ''');
-
-    await db.execute('''
-      CREATE TABLE Account (
-        AccountID INTEGER PRIMARY KEY,
-        Username TEXT UNIQUE NOT NULL,
-        PasswordHash TEXT NOT NULL,
-        StudentID INTEGER UNIQUE NOT NULL,
-        FOREIGN KEY(StudentID) REFERENCES Student(Id) ON DELETE CASCADE
-      );
-    ''');
+    // No-op: tables are provided by the prebuilt asset database. Avoid executing CREATE TABLE here
+    // because it causes 'table ... already exists' errors when the asset DB is copied.
   }
 
   @override
