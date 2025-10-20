@@ -3,7 +3,7 @@ import 'package:student_management/Model/student.dart';
 import 'package:student_management/Data/Database/base_dao.dart';
 import 'package:student_management/Data/Database/student_management_database.dart';
 
-class StudentDao extends BaseDao<Student, int> {
+class StudentDao extends BaseDao<Student, String> {
   final StudentManagementDatabase _database = StudentManagementDatabase();
 
   @override
@@ -20,4 +20,3 @@ class StudentDao extends BaseDao<Student, int> {
     return Student.fromJson(map);
   }
 }
-

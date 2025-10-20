@@ -1,7 +1,7 @@
 import '../Model/base_model.dart';
 
 class Student extends BaseModel {
-  final int? id;
+  final String? id;
   final String fullName;
   final String majorID;
   final String? address;
@@ -38,7 +38,7 @@ class Student extends BaseModel {
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
-      id: json['Id'],
+      id: json['Id'] == null ? null : json['Id'].toString(),
       fullName: json['FullName'],
       majorID: json['MajorID'],
       address: json['Address'],

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../ViewModel/Services/home_viewmodel.dart';
 import '../Model/student.dart';
+import 'package:student_management/Utils/Routes/app_routes.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -12,6 +13,13 @@ class HomeView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Student Management'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            tooltip: 'Manage Students',
+            icon: const Icon(Icons.manage_accounts),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.studentManage),
+          ),
+        ],
       ),
       body: Consumer<HomeViewModel>(
         builder: (context, viewModel, child) {
@@ -61,7 +69,7 @@ class HomeView extends StatelessWidget {
         onPressed: () {
           final viewModel = Provider.of<HomeViewModel>(context, listen: false);
           final newStudent = Student(
-            id: DateTime.now().millisecondsSinceEpoch,
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
             fullName: 'New Student ${viewModel.students.length + 1}',
             majorID: 'SE18',
             phoneNumber: '0${viewModel.students.length + 1}00000000',

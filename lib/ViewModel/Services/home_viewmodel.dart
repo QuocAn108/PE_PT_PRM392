@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import '../../Model/student.dart';
 import 'base_viewmodel.dart';
 import 'package:student_management/Repository/student_repository.dart';
@@ -50,11 +49,27 @@ class HomeViewModel extends BaseViewModel {
     notifyListeners();
   }
 
-  Future<void> removeStudent(int id) async {
+  Future<void> removeStudent(String id) async {
     setLoading(true);
     try {
       await _repo.deleteStudent(id);
       _students.removeWhere((student) => student.id == id);
+      clearError();
+    } catch (e) {
+      setError(e.toString());
+    }
+    setLoading(false);
+    notifyListeners();
+  }
+
+  Future<void> updateStudent(Student student) async {
+    setLoading(true);
+    try {
+      await _repo.updateStudent(student);
+      final index = _students.indexWhere((s) => s.id == student.id);
+      if (index != -1) {
+        _students[index] = student;
+      }
       clearError();
     } catch (e) {
       setError(e.toString());

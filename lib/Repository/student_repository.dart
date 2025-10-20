@@ -4,15 +4,17 @@ import 'package:student_management/Model/student.dart';
 class StudentRepository {
   final StudentDao _dao = StudentDao();
 
-  Future<int> insertStudent(Student student) async {
-    return await _dao.insert(student);
+  // If student.id is provided (String), return it; otherwise use the rowId returned by insert and convert to string.
+  Future<String> insertStudent(Student student) async {
+    final rowId = await _dao.insert(student);
+    return student.id ?? rowId.toString();
   }
 
   Future<List<Student>> getAllStudents() async {
     return await _dao.getAll();
   }
 
-  Future<Student?> getStudentById(int id) async {
+  Future<Student?> getStudentById(String id) async {
     return await _dao.getById(id);
   }
 
@@ -21,8 +23,7 @@ class StudentRepository {
     return await _dao.update(student, student.id!);
   }
 
-  Future<int> deleteStudent(int id) async {
+  Future<int> deleteStudent(String id) async {
     return await _dao.delete(id);
   }
 }
-
