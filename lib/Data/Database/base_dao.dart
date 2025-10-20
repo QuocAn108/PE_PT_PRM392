@@ -1,13 +1,18 @@
 import 'package:sqflite/sqflite.dart';
 import '../../Model/base_model.dart';
 
-abstract class BaseDao<T extends BaseModel> {
+abstract class BaseDao<T extends BaseModel, K> {
   String get tableName;
   String get primaryKey;
 
+  @override
   Future<int> insert(T item) async {
     final db = await database;
-    return await db.insert(tableName, item.toJson());
+    final map = item.toJson();
+    print('Inserting into $tableName: $map');
+    final result = await db.insert(tableName, map);
+    print('Insert result: $result');
+    return result;
   }
 
   Future<List<T>> getAll() async {
@@ -16,7 +21,7 @@ abstract class BaseDao<T extends BaseModel> {
     return maps.map((map) => fromMap(map)).toList();
   }
 
-  Future<T?> getById(int id) async {
+  Future<T?> getById(K id) async {
     final db = await database;
     final List<Map<String, dynamic>> maps = await db.query(
       tableName,
@@ -29,7 +34,7 @@ abstract class BaseDao<T extends BaseModel> {
     return null;
   }
 
-  Future<int> update(T item, int id) async {
+  Future<int> update(T item, K id) async {
     final db = await database;
     return await db.update(
       tableName,
@@ -39,7 +44,7 @@ abstract class BaseDao<T extends BaseModel> {
     );
   }
 
-  Future<int> delete(int id) async {
+  Future<int> delete(K id) async {
     final db = await database;
     return await db.delete(
       tableName,

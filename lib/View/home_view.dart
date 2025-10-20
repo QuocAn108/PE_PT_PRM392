@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../ViewModel/home_viewmodel.dart';
+import '../ViewModel/Services/home_viewmodel.dart';
 import '../Model/student.dart';
+import 'package:student_management/Utils/Routes/app_routes.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -12,6 +13,18 @@ class HomeView extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Student Management'),
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        actions: [
+          IconButton(
+            tooltip: 'Manage Students',
+            icon: const Icon(Icons.manage_accounts),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.studentManage),
+          ),
+          IconButton(
+            tooltip: 'Manage Majors',
+            icon: const Icon(Icons.school),
+            onPressed: () => Navigator.pushNamed(context, AppRoutes.majorManage),
+          ),
+        ],
       ),
       body: Consumer<HomeViewModel>(
         builder: (context, viewModel, child) {
@@ -33,19 +46,26 @@ class HomeView extends StatelessWidget {
                 margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
                 child: ListTile(
                   leading: CircleAvatar(
-                    child: Text(student.name[0].toUpperCase()),
+                    child: Text(student.fullName.isNotEmpty ? student.fullName[0].toUpperCase() : '?'),
                   ),
-                  title: Text(student.name),
-                  subtitle: Text('${student.email}\n${student.phone}'),
+                  title: Text(student.fullName),
+                  subtitle: Text('${student.phoneNumber ?? ''}\nMajor: ${student.majorID}'),
                   isThreeLine: true,
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
-                    onPressed: () => viewModel.removeStudent(student.id),
+                    onPressed: () {
+                      if (student.id == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Cannot delete student without ID')),
+                        );
+                        return;
+                      }
+                      viewModel.removeStudent(student.id!);
+                    },
                   ),
                   onTap: () {
-                    // Navigate to detail view (to be implemented)
                     ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Selected: ${student.name}')),
+                      SnackBar(content: Text('Selected: ${student.fullName}')),
                     );
                   },
                 ),
@@ -56,13 +76,12 @@ class HomeView extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add new student (mock)
           final viewModel = Provider.of<HomeViewModel>(context, listen: false);
           final newStudent = Student(
-            id: DateTime.now().millisecondsSinceEpoch,
-            name: 'New Student ${viewModel.students.length + 1}',
-            email: 'new${viewModel.students.length + 1}@example.com',
-            phone: '0${viewModel.students.length + 1}00000000',
+            id: DateTime.now().millisecondsSinceEpoch.toString(),
+            fullName: 'New Student ${viewModel.students.length + 1}',
+            majorID: 'SE18',
+            phoneNumber: '0${viewModel.students.length + 1}00000000',
           );
           viewModel.addStudent(newStudent);
         },

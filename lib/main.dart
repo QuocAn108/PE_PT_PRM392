@@ -2,11 +2,16 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'Utils/Routes/app_routes.dart';
-import 'ViewModel/home_viewmodel.dart';
+import 'ViewModel/Services/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // If .env is missing, continue with defaults. Prevents startup crash.
+    debugPrint('No .env file found, continuing without it: $e');
+  }
   runApp(const MyApp());
 }
 
