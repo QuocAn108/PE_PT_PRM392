@@ -5,9 +5,28 @@ import 'package:student_management/Model/student.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import 'package:flutter_map/flutter_map.dart';
+import 'package:latlong2/latlong.dart';
 
 class StudentManagementView extends StatelessWidget {
   const StudentManagementView({super.key});
+
+  Future<bool> _geocodeAddress(String address, Function(double, double) onSuccess) async {
+    final url = 'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(address)}&format=json&limit=1';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data.isNotEmpty) {
+        final lat = double.parse(data[0]['lat']);
+        final lon = double.parse(data[0]['lon']);
+        onSuccess(lat, lon);
+        return true;
+      }
+    }
+    return false;
+  }
 
   Future<void> _showEditDialog(BuildContext context, {Student? student}) async {
     final isNew = student == null;
@@ -19,6 +38,8 @@ class StudentManagementView extends StatelessWidget {
     final phoneController = TextEditingController(text: student?.phoneNumber ?? '');
 
     String? avatarURL = student?.avatarURL;
+    double? latitude = student?.latitude;
+    double? longitude = student?.longitude;
 
     final formKey = GlobalKey<FormState>();
 
@@ -91,10 +112,65 @@ class StudentManagementView extends StatelessWidget {
                           decoration: const InputDecoration(labelText: 'Major'),
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Select major' : null,
                         ),
-                        TextFormField(
-                          controller: addressController,
-                          decoration: const InputDecoration(labelText: 'Address'),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextFormField(
+                                controller: addressController,
+                                decoration: const InputDecoration(labelText: 'Address'),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            ElevatedButton(
+                              onPressed: () async {
+                                final address = addressController.text.trim();
+                                if (address.isNotEmpty) {
+                                  final success = await _geocodeAddress(address, (lat, lon) {
+                                    setState(() {
+                                      latitude = lat;
+                                      longitude = lon;
+                                    });
+                                  });
+                                  if (!success) {
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(content: Text('Failed to geocode address')),
+                                    );
+                                  }
+                                }
+                              },
+                              child: const Text('Geocode'),
+                            ),
+                          ],
                         ),
+                        if (latitude != null && longitude != null)
+                          SizedBox(
+                            width: double.infinity,
+                            height: 200,
+                            child: FlutterMap(
+                              options: MapOptions(
+                                initialCenter: LatLng(latitude!, longitude!),
+                                initialZoom: 15.0,
+                              ),
+                              children: [
+                                TileLayer(
+                                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+                                  userAgentPackageName: 'com.example.app',
+                                ),
+                                MarkerLayer(
+                                  markers: [
+                                    Marker(
+                                      point: LatLng(latitude!, longitude!),
+                                      child: const Icon(
+                                        Icons.location_pin,
+                                        color: Colors.red,
+                                        size: 40,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
                         TextFormField(
                           controller: phoneController,
                           decoration: const InputDecoration(labelText: 'Phone'),
@@ -111,12 +187,14 @@ class StudentManagementView extends StatelessWidget {
                       if (!formKey.currentState!.validate()) return;
                       final vm = Provider.of<HomeViewModel>(context, listen: false);
                       final s = Student(
-                        id: isNew ? (idController.text.trim().isEmpty ? null : idController.text.trim()) : student?.id,
+                        id: isNew ? (idController.text.trim().isEmpty ? null : idController.text.trim()) : student.id,
                         fullName: fullNameController.text.trim(),
                         majorID: selectedMajorId ?? '',
                         address: addressController.text.trim().isEmpty ? null : addressController.text.trim(),
                         phoneNumber: phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
                         avatarURL: avatarURL,
+                        latitude: latitude,
+                        longitude: longitude,
                       );
 
                       try {
