@@ -1,17 +1,23 @@
 import '../../Model/student.dart';
+import '../../Model/major.dart';
 import 'base_viewmodel.dart';
 import 'package:student_management/Repository/student_repository.dart';
+import 'package:student_management/Data/Database/major_dao.dart';
 
 class HomeViewModel extends BaseViewModel {
   final StudentRepository _repo = StudentRepository();
+  final MajorDao _majorDao = MajorDao();
   List<Student> _students = [];
+  List<Major> _majors = [];
 
   List<Student> get students => _students;
+  List<Major> get majors => _majors;
 
   @override
   void init() {
     super.init();
     _loadStudentsFromDb();
+    _loadMajorsFromDb();
   }
 
   Future<void> _loadStudentsFromDb() async {
@@ -24,6 +30,25 @@ class HomeViewModel extends BaseViewModel {
       setError(e.toString());
     }
     setLoading(false);
+    notifyListeners();
+  }
+
+  Future<void> _loadMajorsFromDb() async {
+    // load majors but do not toggle the global loading state to avoid interfering with UI spinners
+    try {
+      final list = await _majorDao.getAll();
+      _majors = list;
+      clearError();
+    } catch (e) {
+      setError(e.toString());
+    }
+    notifyListeners();
+  }
+
+  String? getMajorNameById(String? id) {
+    if (id == null) return null;
+    final m = _majors.firstWhere((e) => e.id == id, orElse: () => Major(id: id, majorName: id));
+    return m.majorName;
   }
 
   Future<void> addStudent(Student student) async {

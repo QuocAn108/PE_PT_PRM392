@@ -14,6 +14,7 @@ class StudentManagementDatabase extends BaseDatabase {
   @override
   Future<Database> initDatabase() async {
     String path = join(await getDatabasesPath(), databaseName);
+    print('Database path: $path');
     bool exists = await databaseExists(path);
     bool copied = false;
 

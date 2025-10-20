@@ -49,9 +49,13 @@ class HomeView extends StatelessWidget {
                   trailing: IconButton(
                     icon: const Icon(Icons.delete, color: Colors.red),
                     onPressed: () {
-                      if (student.id != null) {
-                        viewModel.removeStudent(student.id!);
+                      if (student.id == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('Cannot delete student without ID')),
+                        );
+                        return;
                       }
+                      viewModel.removeStudent(student.id!);
                     },
                   ),
                   onTap: () {

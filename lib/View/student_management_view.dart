@@ -8,8 +8,10 @@ class StudentManagementView extends StatelessWidget {
 
   Future<void> _showEditDialog(BuildContext context, {Student? student}) async {
     final isNew = student == null;
+    final idController = TextEditingController(text: student?.id ?? '');
     final fullNameController = TextEditingController(text: student?.fullName ?? '');
-    final majorController = TextEditingController(text: student?.majorID ?? '');
+    // We no longer use a plain text controller for major; use selectedMajorId instead
+    String? selectedMajorId = student?.majorID;
     final addressController = TextEditingController(text: student?.address ?? '');
     final phoneController = TextEditingController(text: student?.phoneNumber ?? '');
 
@@ -17,68 +19,85 @@ class StudentManagementView extends StatelessWidget {
 
     await showDialog<void>(
       context: context,
-      builder: (ctx) => AlertDialog(
-        title: Text(isNew ? 'Add Student' : 'Edit Student'),
-        content: Form(
-          key: formKey,
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                TextFormField(
-                  controller: fullNameController,
-                  decoration: const InputDecoration(labelText: 'Full Name'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter full name' : null,
+      builder: (ctx) {
+        return Consumer<HomeViewModel>(builder: (c, vm, _) {
+          final majors = vm.majors;
+          return AlertDialog(
+            title: Text(isNew ? 'Add Student' : 'Edit Student'),
+            content: Form(
+              key: formKey,
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    TextFormField(
+                      controller: idController,
+                      decoration: const InputDecoration(labelText: 'ID'),
+                      enabled: isNew, // Allow editing ID only for new students
+                    ),
+                    TextFormField(
+                      controller: fullNameController,
+                      decoration: const InputDecoration(labelText: 'Full Name'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter full name' : null,
+                    ),
+                    // Dropdown for majors: displays Major.majorName but stores Major.id
+                    DropdownButtonFormField<String>(
+                      initialValue: selectedMajorId,
+                      items: majors
+                          .map((m) => DropdownMenuItem<String>(value: m.id, child: Text(m.majorName)))
+                          .toList(),
+                      onChanged: (v) {
+                        selectedMajorId = v;
+                      },
+                      decoration: const InputDecoration(labelText: 'Major'),
+                      validator: (v) => (v == null || v.trim().isEmpty) ? 'Select major' : null,
+                    ),
+                    TextFormField(
+                      controller: addressController,
+                      decoration: const InputDecoration(labelText: 'Address'),
+                    ),
+                    TextFormField(
+                      controller: phoneController,
+                      decoration: const InputDecoration(labelText: 'Phone'),
+                      keyboardType: TextInputType.phone,
+                    ),
+                  ],
                 ),
-                TextFormField(
-                  controller: majorController,
-                  decoration: const InputDecoration(labelText: 'Major ID'),
-                  validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter major' : null,
-                ),
-                TextFormField(
-                  controller: addressController,
-                  decoration: const InputDecoration(labelText: 'Address'),
-                ),
-                TextFormField(
-                  controller: phoneController,
-                  decoration: const InputDecoration(labelText: 'Phone'),
-                  keyboardType: TextInputType.phone,
-                ),
-              ],
+              ),
             ),
-          ),
-        ),
-        actions: [
-          TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
-          ElevatedButton(
-            onPressed: () async {
-              if (!formKey.currentState!.validate()) return;
-              final vm = Provider.of<HomeViewModel>(context, listen: false);
-              final s = Student(
-                id: student?.id,
-                fullName: fullNameController.text.trim(),
-                majorID: majorController.text.trim(),
-                address: addressController.text.trim().isEmpty ? null : addressController.text.trim(),
-                phoneNumber: phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
-              );
+            actions: [
+              TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+              ElevatedButton(
+                onPressed: () async {
+                  if (!formKey.currentState!.validate()) return;
+                  final vm = Provider.of<HomeViewModel>(context, listen: false);
+                  final s = Student(
+                    id: isNew ? (idController.text.trim().isEmpty ? null : idController.text.trim()) : student?.id,
+                    fullName: fullNameController.text.trim(),
+                    majorID: selectedMajorId ?? '',
+                    address: addressController.text.trim().isEmpty ? null : addressController.text.trim(),
+                    phoneNumber: phoneController.text.trim().isEmpty ? null : phoneController.text.trim(),
+                  );
 
-              try {
-                if (isNew) {
-                  await vm.addStudent(s);
-                } else {
-                  await vm.updateStudent(s);
-                }
-                if (context.mounted) Navigator.of(ctx).pop();
-              } catch (e) {
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
-                }
-              }
-            },
-            child: Text(isNew ? 'Add' : 'Save'),
-          ),
-        ],
-      ),
+                  try {
+                    if (isNew) {
+                      await vm.addStudent(s);
+                    } else {
+                      await vm.updateStudent(s);
+                    }
+                    if (context.mounted) Navigator.of(ctx).pop();
+                  } catch (e) {
+                    if (context.mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                    }
+                  }
+                },
+                child: Text(isNew ? 'Add' : 'Save'),
+              ),
+            ],
+          );
+        });
+      },
     );
   }
 
@@ -103,7 +122,7 @@ class StudentManagementView extends StatelessWidget {
               return ListTile(
                 leading: CircleAvatar(child: Text(s.fullName.isNotEmpty ? s.fullName[0].toUpperCase() : '?')),
                 title: Text(s.fullName),
-                subtitle: Text('Major: ${s.majorID}\nPhone: ${s.phoneNumber ?? '-'}'),
+                subtitle: Text('Major: ${vm.getMajorNameById(s.majorID) ?? s.majorID}\nPhone: ${s.phoneNumber ?? '-'}'),
                 isThreeLine: true,
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
@@ -115,6 +134,12 @@ class StudentManagementView extends StatelessWidget {
                     IconButton(
                       icon: const Icon(Icons.delete, color: Colors.red),
                       onPressed: () async {
+                        if (s.id == null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(content: Text('Cannot delete student without ID')),
+                          );
+                          return;
+                        }
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (dctx) => AlertDialog(
@@ -145,4 +170,3 @@ class StudentManagementView extends StatelessWidget {
     );
   }
 }
-

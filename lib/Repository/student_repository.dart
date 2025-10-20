@@ -4,10 +4,21 @@ import 'package:student_management/Model/student.dart';
 class StudentRepository {
   final StudentDao _dao = StudentDao();
 
-  // If student.id is provided (String), return it; otherwise use the rowId returned by insert and convert to string.
+  // If student.id is provided (String), return it; otherwise generate a UUID and use it.
   Future<String> insertStudent(Student student) async {
-    final rowId = await _dao.insert(student);
-    return student.id ?? rowId.toString();
+    final id = student.id ?? DateTime.now().millisecondsSinceEpoch.toString();
+    final studentWithId = Student(
+      id: id,
+      fullName: student.fullName,
+      majorID: student.majorID,
+      address: student.address,
+      phoneNumber: student.phoneNumber,
+      avatarURL: student.avatarURL,
+      latitude: student.latitude,
+      longitude: student.longitude,
+    );
+    await _dao.insert(studentWithId);
+    return id;
   }
 
   Future<List<Student>> getAllStudents() async {

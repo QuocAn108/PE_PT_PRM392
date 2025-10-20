@@ -5,9 +5,14 @@ abstract class BaseDao<T extends BaseModel, K> {
   String get tableName;
   String get primaryKey;
 
+  @override
   Future<int> insert(T item) async {
     final db = await database;
-    return await db.insert(tableName, item.toJson());
+    final map = item.toJson();
+    print('Inserting into $tableName: $map');
+    final result = await db.insert(tableName, map);
+    print('Insert result: $result');
+    return result;
   }
 
   Future<List<T>> getAll() async {
