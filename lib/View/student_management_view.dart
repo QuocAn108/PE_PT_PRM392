@@ -11,6 +11,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:student_management/View/student_detail_view.dart';
 
 class StudentManagementView extends StatelessWidget {
   const StudentManagementView({super.key});
@@ -302,6 +303,7 @@ class StudentManagementView extends StatelessWidget {
             itemBuilder: (ctx, i) {
               final s = vm.students[i];
               return ListTile(
+                onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => StudentDetailView(student: s))),
                 leading: CircleAvatar(
                   backgroundImage: (s.avatarURL?.isNotEmpty ?? false)
                       ? FileImage(File(s.avatarURL!))
