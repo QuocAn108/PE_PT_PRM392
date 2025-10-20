@@ -6,7 +6,12 @@ import 'ViewModel/Services/home_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await dotenv.load(fileName: ".env");
+  try {
+    await dotenv.load(fileName: ".env");
+  } catch (e) {
+    // If .env is missing, continue with defaults. Prevents startup crash.
+    debugPrint('No .env file found, continuing without it: $e');
+  }
   runApp(const MyApp());
 }
 
