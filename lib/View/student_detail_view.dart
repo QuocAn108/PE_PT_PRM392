@@ -2,14 +2,64 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:student_management/ViewModel/Services/home_viewmodel.dart';
 import 'package:student_management/Model/student.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'dart:io';
+import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class StudentDetailView extends StatelessWidget {
+class StudentDetailView extends StatefulWidget {
   final Student student;
 
   const StudentDetailView({super.key, required this.student});
+
+  @override
+  State<StudentDetailView> createState() => _StudentDetailViewState();
+}
+
+class _StudentDetailViewState extends State<StudentDetailView> {
+  final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
+  double? _latitude;
+  double? _longitude;
+  bool _isGeocoding = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _latitude = widget.student.latitude;
+    _longitude = widget.student.longitude;
+    if (_latitude == null && _longitude == null && widget.student.address != null && widget.student.address!.isNotEmpty) {
+      _geocodeAddress();
+    }
+  }
+
+  Future<void> _geocodeAddress() async {
+    setState(() {
+      _isGeocoding = true;
+    });
+    const apiKey = 'AIzaSyCGprFnwxF0SQJvHMfoCdnso6CQ_NiSkqo'; // Replace with your actual API key
+    final url = 'https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(widget.student.address!)}&key=$apiKey';
+    final response = await http.get(Uri.parse(url));
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        final location = data['results'][0]['geometry']['location'];
+        setState(() {
+          _latitude = location['lat'];
+          _longitude = location['lng'];
+          _isGeocoding = false;
+        });
+      } else {
+        setState(() {
+          _isGeocoding = false;
+        });
+      }
+    } else {
+      setState(() {
+        _isGeocoding = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -19,7 +69,7 @@ class StudentDetailView extends StatelessWidget {
       ),
       body: Consumer<HomeViewModel>(
         builder: (context, vm, child) {
-          final majorName = vm.getMajorNameById(student.majorID) ?? 'Unknown';
+          final majorName = vm.getMajorNameById(widget.student.majorID) ?? 'Unknown';
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16.0),
             child: Column(
@@ -29,13 +79,13 @@ class StudentDetailView extends StatelessWidget {
                 Center(
                   child: CircleAvatar(
                     radius: 50,
-                    backgroundImage: (student.avatarURL?.isNotEmpty ?? false)
-                        ? FileImage(File(student.avatarURL!))
+                    backgroundImage: (widget.student.avatarURL?.isNotEmpty ?? false)
+                        ? FileImage(File(widget.student.avatarURL!))
                         : null,
-                    child: (student.avatarURL?.isEmpty ?? true)
+                    child: (widget.student.avatarURL?.isEmpty ?? true)
                         ? Text(
-                            student.fullName.isNotEmpty
-                                ? student.fullName[0].toUpperCase()
+                            widget.student.fullName.isNotEmpty
+                                ? widget.student.fullName[0].toUpperCase()
                                 : '?',
                             style: const TextStyle(fontSize: 40),
                           )
@@ -45,13 +95,13 @@ class StudentDetailView extends StatelessWidget {
                 const SizedBox(height: 20),
                 // Full Name
                 Text(
-                  'Full Name: ${student.fullName}',
+                  'Full Name: ${widget.student.fullName}',
                   style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 10),
                 // ID
                 Text(
-                  'ID: ${student.id ?? 'N/A'}',
+                  'ID: ${widget.student.id ?? 'N/A'}',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 10),
@@ -63,45 +113,41 @@ class StudentDetailView extends StatelessWidget {
                 const SizedBox(height: 10),
                 // Address
                 Text(
-                  'Address: ${student.address ?? 'N/A'}',
+                  'Address: ${widget.student.address ?? 'N/A'}',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 10),
                 // Phone
                 Text(
-                  'Phone: ${student.phoneNumber ?? 'N/A'}',
+                  'Phone: ${widget.student.phoneNumber ?? 'N/A'}',
                   style: const TextStyle(fontSize: 16),
                 ),
                 const SizedBox(height: 20),
                 // Map if coordinates available
-                if (student.latitude != null && student.longitude != null)
+                if (_latitude != null && _longitude != null)
                   SizedBox(
                     width: double.infinity,
                     height: 300,
-                    child: FlutterMap(
-                      options: MapOptions(
-                        initialCenter: LatLng(student.latitude!, student.longitude!),
-                        initialZoom: 15.0,
+                    child: GoogleMap(
+                      onMapCreated: (GoogleMapController controller) {
+                        _controller.complete(controller);
+                      },
+                      initialCameraPosition: CameraPosition(
+                        target: LatLng(_latitude!, _longitude!),
+                        zoom: 15.0,
                       ),
-                      children: [
-                        TileLayer(
-                          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                          userAgentPackageName: 'com.example.app',
+                      markers: {
+                        Marker(
+                          markerId: MarkerId('studentLocation'),
+                          position: LatLng(_latitude!, _longitude!),
+                          icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
                         ),
-                        MarkerLayer(
-                          markers: [
-                            Marker(
-                              point: LatLng(student.latitude!, student.longitude!),
-                              child: const Icon(
-                                Icons.location_pin,
-                                color: Colors.red,
-                                size: 40,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
+                      },
                     ),
+                  ),
+                if (_isGeocoding)
+                  const Center(
+                    child: CircularProgressIndicator(),
                   ),
               ],
             ),

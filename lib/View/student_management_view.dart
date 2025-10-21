@@ -5,10 +5,10 @@ import 'package:student_management/Model/student.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import 'dart:async';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:student_management/View/student_detail_view.dart';
@@ -17,13 +17,15 @@ class StudentManagementView extends StatelessWidget {
   const StudentManagementView({super.key});
 
   Future<bool> _geocodeAddress(String address, Function(double, double) onSuccess) async {
-    final url = 'https://nominatim.openstreetmap.org/search?q=${Uri.encodeComponent(address)}&format=json&limit=1';
+    const apiKey = 'YAIzaSyCGprFnwxF0SQJvHMfoCdnso6CQ_NiSkqo'; // Replace with your actual API key
+    final url = 'https://maps.googleapis.com/maps/api/geocode/json?address=${Uri.encodeComponent(address)}&key=$apiKey';
     final response = await http.get(Uri.parse(url));
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
-      if (data.isNotEmpty) {
-        final lat = double.parse(data[0]['lat']);
-        final lon = double.parse(data[0]['lon']);
+      if (data['status'] == 'OK' && data['results'].isNotEmpty) {
+        final location = data['results'][0]['geometry']['location'];
+        final lat = location['lat'];
+        final lon = location['lng'];
         onSuccess(lat, lon);
         return true;
       }
@@ -51,6 +53,21 @@ class StudentManagementView extends StatelessWidget {
       builder: (ctx) {
         return StatefulBuilder(
           builder: (context, setState) {
+            Timer? _debounce;
+            addressController.addListener(() {
+              _debounce?.cancel();
+              _debounce = Timer(const Duration(seconds: 1), () async {
+                final address = addressController.text.trim();
+                if (address.isNotEmpty) {
+                  await _geocodeAddress(address, (lat, lon) {
+                    setState(() {
+                      latitude = lat;
+                      longitude = lon;
+                    });
+                  });
+                }
+              });
+            });
             return Consumer<HomeViewModel>(builder: (c, vm, _) {
               final majors = vm.majors;
               return AlertDialog(
@@ -132,65 +149,34 @@ class StudentManagementView extends StatelessWidget {
                           decoration: const InputDecoration(labelText: 'Major'),
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Select major' : null,
                         ),
-                        Row(
-                          children: [
-                            Expanded(
-                              child: TextFormField(
-                                controller: addressController,
-                                decoration: const InputDecoration(labelText: 'Address'),
-                              ),
-                            ),
-                            const SizedBox(width: 10),
-                            ElevatedButton(
-                              onPressed: () async {
-                                final address = addressController.text.trim();
-                                if (address.isNotEmpty) {
-                                  final success = await _geocodeAddress(address, (lat, lon) {
-                                    setState(() {
-                                      latitude = lat;
-                                      longitude = lon;
-                                    });
-                                  });
-                                  if (!success) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(content: Text('Failed to geocode address')),
-                                    );
-                                  }
-                                }
-                              },
-                              child: const Text('Geocode'),
-                            ),
-                          ],
+                        TextFormField(
+                          controller: addressController,
+                          decoration: const InputDecoration(labelText: 'Address'),
                         ),
-                        if (latitude != null && longitude != null)
-                          SizedBox(
-                            width: double.infinity,
-                            height: 200,
-                            child: FlutterMap(
-                              options: MapOptions(
-                                initialCenter: LatLng(latitude!, longitude!),
-                                initialZoom: 15.0,
-                              ),
-                              children: [
-                                TileLayer(
-                                  urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  userAgentPackageName: 'com.example.app',
-                                ),
-                                MarkerLayer(
-                                  markers: [
-                                    Marker(
-                                      point: LatLng(latitude!, longitude!),
-                                      child: const Icon(
-                                        Icons.location_pin,
-                                        color: Colors.red,
-                                        size: 40,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
+                        SizedBox(
+                          width: double.infinity,
+                          height: 200,
+                          child: GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                              target: LatLng(latitude ?? 0, longitude ?? 0),
+                              zoom: 15.0,
                             ),
+                            markers: {
+                              if (latitude != null && longitude != null)
+                                Marker(
+                                  markerId: const MarkerId('geocoded-location'),
+                                  position: LatLng(latitude!, longitude!),
+                                  icon: BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueRed),
+                                ),
+                            },
+                            onTap: (latLng) {
+                              setState(() {
+                                latitude = latLng.latitude;
+                                longitude = latLng.longitude;
+                              });
+                            },
                           ),
+                        ),
                         TextFormField(
                           controller: phoneController,
                           decoration: const InputDecoration(labelText: 'Phone'),
