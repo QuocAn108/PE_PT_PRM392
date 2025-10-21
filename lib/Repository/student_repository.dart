@@ -10,12 +10,10 @@ class StudentRepository {
     final studentWithId = Student(
       id: id,
       fullName: student.fullName,
-      majorID: student.majorID,
+      majorId: student.majorId,
       address: student.address,
       phoneNumber: student.phoneNumber,
-      avatarURL: student.avatarURL,
-      latitude: student.latitude,
-      longitude: student.longitude,
+      avatarPath: student.avatarPath,
     );
     await _dao.insert(studentWithId);
     return id;

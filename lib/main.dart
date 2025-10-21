@@ -1,17 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'Utils/Routes/app_routes.dart';
-import 'ViewModel/Services/home_viewmodel.dart';
+import 'ViewModel/Services/auth_viewmodel.dart';
+import 'ViewModel/Services/student_viewmodel.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  try {
-    await dotenv.load(fileName: ".env");
-  } catch (e) {
-    // If .env is missing, continue with defaults. Prevents startup crash.
-    debugPrint('No .env file found, continuing without it: $e');
-  }
+  await dotenv.load(fileName: ".env");
   runApp(const MyApp());
 }
 
@@ -22,10 +18,11 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => HomeViewModel()..init()),
+        ChangeNotifierProvider(create: (_) => AuthViewModel()),
+        ChangeNotifierProvider(create: (_) => SinhVienViewModel()),
       ],
       child: MaterialApp(
-        title: dotenv.env['APP_NAME'] ?? 'Student Management',
+        title: 'Student Management',
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         ),

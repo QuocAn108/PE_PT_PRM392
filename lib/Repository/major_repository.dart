@@ -5,14 +5,9 @@ class MajorRepository {
   final MajorDao _dao = MajorDao();
 
   Future<String> insertMajor(Major major) async {
-    final id = major.id ?? DateTime.now().millisecondsSinceEpoch.toString();
-    final majorWithId = Major(
-      id: id,
-      majorName: major.majorName,
-      description: major.description,
-    );
-    await _dao.insert(majorWithId);
-    return id;
+    // Use provided Id from the Major instance.
+    await _dao.insert(major);
+    return major.id;
   }
 
   Future<List<Major>> getAllMajors() async {

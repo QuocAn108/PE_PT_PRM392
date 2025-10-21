@@ -1,74 +1,155 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:student_management/ViewModel/Services/home_viewmodel.dart';
-import 'package:student_management/Model/major.dart';
+import '../../Model/major.dart';
+import '../../ViewModel/Services/auth_viewmodel.dart';
+import '../ViewModel/Services/student_viewmodel.dart';
 
-class MajorManagementView extends StatelessWidget {
-  const MajorManagementView({super.key});
+class NganhManagementView extends StatefulWidget {
+  const NganhManagementView({super.key});
 
-  Future<void> _showEditDialog(BuildContext context, {Major? major}) async {
-    final isNew = major == null;
-    final idController = TextEditingController(text: major?.id ?? '');
-    final majorNameController = TextEditingController(text: major?.majorName ?? '');
-    final descriptionController = TextEditingController(text: major?.description ?? '');
+  @override
+  State<NganhManagementView> createState() => _NganhManagementViewState();
+}
 
+class _NganhManagementViewState extends State<NganhManagementView> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Provider.of<SinhVienViewModel>(context, listen: false).fetchNganhs();
+    });
+  }
+
+  void _showAddEditDialog({Major? nganh}) {
+    final maNganhController = TextEditingController(text: nganh?.id ?? '');
+    final tenNganhController = TextEditingController(text: nganh?.name ?? '');
     final formKey = GlobalKey<FormState>();
+    final isEditing = nganh != null;
 
-    await showDialog<void>(
+    showDialog(
       context: context,
-      builder: (ctx) {
+      builder: (dialogContext) {
         return AlertDialog(
-          title: Text(isNew ? 'Add Major' : 'Edit Major'),
+          title: Text(isEditing ? 'Chỉnh Sửa Ngành' : 'Thêm Ngành Mới'),
           content: Form(
             key: formKey,
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  TextFormField(
-                    controller: idController,
-                    decoration: const InputDecoration(labelText: 'ID'),
-                    enabled: isNew, // Allow editing ID only for new majors
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextFormField(
+                  controller: maNganhController,
+                  decoration: InputDecoration(
+                    labelText: 'Mã Ngành',
+                    prefixIcon: const Icon(Icons.code),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  TextFormField(
-                    controller: majorNameController,
-                    decoration: const InputDecoration(labelText: 'Major Name'),
-                    validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter major name' : null,
+                  enabled: !isEditing, // Không cho sửa mã khi edit
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Vui lòng nhập mã ngành';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                TextFormField(
+                  controller: tenNganhController,
+                  decoration: InputDecoration(
+                    labelText: 'Tên Ngành',
+                    prefixIcon: const Icon(Icons.school),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
-                  TextFormField(
-                    controller: descriptionController,
-                    decoration: const InputDecoration(labelText: 'Description'),
-                  ),
-                ],
-              ),
+                  validator: (value) {
+                    if (value?.isEmpty ?? true) return 'Vui lòng nhập tên ngành';
+                    return null;
+                  },
+                ),
+              ],
             ),
           ),
           actions: [
-            TextButton(onPressed: () => Navigator.of(ctx).pop(), child: const Text('Cancel')),
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Hủy'),
+            ),
             ElevatedButton(
               onPressed: () async {
-                if (!formKey.currentState!.validate()) return;
-                final vm = Provider.of<HomeViewModel>(context, listen: false);
-                final m = Major(
-                  id: isNew ? (idController.text.trim().isEmpty ? DateTime.now().millisecondsSinceEpoch.toString() : idController.text.trim()) : major!.id,
-                  majorName: majorNameController.text.trim(),
-                  description: descriptionController.text.trim().isEmpty ? null : descriptionController.text.trim(),
-                );
+                if (formKey.currentState?.validate() ?? false) {
+                  final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                  final scaffoldMessenger = ScaffoldMessenger.of(context);
+                  final navigator = Navigator.of(dialogContext);
+                  
+                  final newNganh = Major(
+                    id: maNganhController.text.trim(),
+                    name: tenNganhController.text.trim(),
+                  );
 
-                try {
-                  if (isNew) {
-                    await vm.addMajor(m);
-                  } else {
-                    await vm.updateMajor(m);
-                  }
-                  if (context.mounted) Navigator.of(ctx).pop();
-                } catch (e) {
-                  if (context.mounted) {
-                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Error: $e')));
+                  try {
+                    if (isEditing) {
+                      await viewModel.updateNganh(newNganh);
+                    } else {
+                      await viewModel.addNganh(newNganh);
+                    }
+                    
+                    navigator.pop();
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!'),
+                        backgroundColor: Colors.green,
+                      ),
+                    );
+                  } catch (e) {
+                    scaffoldMessenger.showSnackBar(
+                      SnackBar(
+                        content: Text('Lỗi: $e'),
+                        backgroundColor: Colors.red,
+                      ),
+                    );
                   }
                 }
               },
-              child: Text(isNew ? 'Add' : 'Save'),
+              child: Text(isEditing ? 'Cập Nhật' : 'Thêm'),
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _confirmDelete(Major nganh) {
+    showDialog(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: const Text('Xác Nhận Xóa'),
+          content: Text('Bạn có chắc chắn muốn xóa ngành "${nganh.name}"?\n\nLưu ý: Các sinh viên thuộc ngành này sẽ có MaNganh = NULL.'),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext),
+              child: const Text('Hủy'),
+            ),
+            ElevatedButton(
+              onPressed: () async {
+                final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                final scaffoldMessenger = ScaffoldMessenger.of(context);
+                final navigator = Navigator.of(dialogContext);
+                
+                await viewModel.deleteNganh(nganh.id);
+
+                navigator.pop();
+                scaffoldMessenger.showSnackBar(
+                  const SnackBar(
+                    content: Text('Xóa thành công!'),
+                    backgroundColor: Colors.green,
+                  ),
+                );
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.red,
+              ),
+              child: const Text('Xóa'),
             ),
           ],
         );
@@ -78,63 +159,119 @@ class MajorManagementView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text('Majors')),
-      body: Consumer<HomeViewModel>(
-        builder: (context, vm, child) {
-          if (vm.isLoading) return const Center(child: CircularProgressIndicator());
-          if (vm.errorMessage != null) return Center(child: Text('Error: ${vm.errorMessage}'));
+    final authViewModel = context.watch<AuthViewModel>();
+    final isAdmin = authViewModel.isAdmin;
 
-          if (vm.majors.isEmpty) {
-            return const Center(child: Text('No majors found'));
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(isAdmin ? 'Quản Lý Ngành' : 'Danh Sách Ngành'),
+        elevation: 0,
+      ),
+      body: Consumer<SinhVienViewModel>(
+        builder: (context, viewModel, child) {
+          if (viewModel.isLoading) {
+            return const Center(child: CircularProgressIndicator());
           }
 
-          return ListView.separated(
-            itemCount: vm.majors.length,
-            separatorBuilder: (_, __) => const Divider(height: 1),
-            itemBuilder: (ctx, i) {
-              final m = vm.majors[i];
-              return ListTile(
-                leading: CircleAvatar(child: Text(m.majorName.isNotEmpty ? m.majorName[0].toUpperCase() : '?')),
-                title: Text(m.majorName),
-                subtitle: Text(m.description ?? '-'),
-                trailing: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    IconButton(
-                      icon: const Icon(Icons.edit, color: Colors.blue),
-                      onPressed: () => _showEditDialog(context, major: m),
+          if (viewModel.nganhs.isEmpty) {
+            return Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.school_outlined,
+                    size: 100,
+                    color: Colors.grey.shade400,
+                  ),
+                  const SizedBox(height: 16),
+                  Text(
+                    'Chưa có ngành nào',
+                    style: TextStyle(
+                      fontSize: 18,
+                      color: Colors.grey.shade600,
                     ),
-                    IconButton(
-                      icon: const Icon(Icons.delete, color: Colors.red),
-                      onPressed: () async {
-                        final confirm = await showDialog<bool>(
-                          context: context,
-                          builder: (dctx) => AlertDialog(
-                            title: const Text('Confirm delete'),
-                            content: Text('Delete ${m.majorName}?'),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.of(dctx).pop(false), child: const Text('Cancel')),
-                              ElevatedButton(onPressed: () => Navigator.of(dctx).pop(true), child: const Text('Delete')),
-                            ],
-                          ),
-                        );
-                        if (confirm == true) {
-                          await vm.removeMajor(m.id!);
-                        }
-                      },
+                  ),
+                  if (isAdmin) ...[
+                    const SizedBox(height: 24),
+                    ElevatedButton.icon(
+                      onPressed: () => _showAddEditDialog(),
+                      icon: const Icon(Icons.add),
+                      label: const Text('Thêm Ngành Đầu Tiên'),
                     ),
                   ],
+                ],
+              ),
+            );
+          }
+
+          return ListView.builder(
+            padding: const EdgeInsets.all(8),
+            itemCount: viewModel.nganhs.length,
+            itemBuilder: (context, index) {
+              final nganh = viewModel.nganhs[index];
+              return Card(
+                margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                elevation: 2,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: ListTile(
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                  leading: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: Colors.blue.shade100,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Icon(
+                      Icons.school,
+                      color: Colors.blue.shade700,
+                    ),
+                  ),
+                  title: Text(
+                    nganh.name,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  subtitle: Text(
+                    'Mã: ${nganh.id}',
+                    style: TextStyle(
+                      color: Colors.grey.shade600,
+                    ),
+                  ),
+                  trailing: isAdmin
+                      ? Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            IconButton(
+                              icon: const Icon(Icons.edit, color: Colors.blue),
+                              onPressed: () => _showAddEditDialog(nganh: nganh),
+                              tooltip: 'Chỉnh sửa',
+                            ),
+                            IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _confirmDelete(nganh),
+                              tooltip: 'Xóa',
+                            ),
+                          ],
+                        )
+                      : null,
                 ),
               );
             },
           );
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showEditDialog(context),
-        child: const Icon(Icons.add),
-      ),
+      floatingActionButton: isAdmin
+          ? FloatingActionButton.extended(
+              onPressed: () => _showAddEditDialog(),
+              icon: const Icon(Icons.add),
+              label: const Text('Thêm Ngành'),
+              backgroundColor: Colors.blue.shade600,
+            )
+          : null,
     );
   }
 }
