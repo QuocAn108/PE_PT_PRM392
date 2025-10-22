@@ -10,8 +10,8 @@ class Major extends BaseModel {
   });
 
   // Compatibility getters
-  String get maNganh => id;
-  String get tenNganh => name;
+  String get majorId => id;
+  String get majorName => name;
 
   @override
   Map<String, dynamic> toJson() {

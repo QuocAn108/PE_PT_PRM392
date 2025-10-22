@@ -1,3 +1,5 @@
+import 'package:flutter_contacts/flutter_contacts.dart';
+
 import '../Model/base_model.dart';
 
 class Student extends BaseModel {
@@ -18,10 +20,10 @@ class Student extends BaseModel {
   });
 
   // Compatibility getters
-  String? get maSV => id;
-  String get hoTen => fullName;
-  String? get diaChi => address;
-  String? get soDT => phoneNumber;
+  String? get studentId => id;
+  String get full_name => fullName;
+  String? get addresss => address;
+  String? get phone_number => phoneNumber;
   String? get maNganh => majorId;
 
   @override

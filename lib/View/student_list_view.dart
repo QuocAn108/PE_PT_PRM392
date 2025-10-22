@@ -39,7 +39,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
     _fabAnimationController.forward();
     
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SinhVienViewModel>(context, listen: false).loadAllData();
+      Provider.of<StudentViewmodel>(context, listen: false).loadAllData();
     });
   }
 
@@ -77,7 +77,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             ),
             ElevatedButton(
               onPressed: () async {
-                final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
                 final navigator = Navigator.of(dialogContext);
                 
@@ -125,13 +125,13 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 contentPadding: EdgeInsets.zero,
                 leading: UserAvatar(
                   avatarPath: currentUser?.avatarPath,
-                  userName: currentUser?.hoTen ?? '?',
+                  userName: currentUser?.full_name ?? '?',
                 ),
                 title: Text(
-                  currentUser?.hoTen ?? 'N/A',
+                  currentUser?.full_name ?? 'N/A',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text('Mã SV: ${currentUser?.maSV ?? 'N/A'}'),
+                subtitle: Text('Mã SV: ${currentUser?.studentId ?? 'N/A'}'),
               ),
               const Divider(),
               ListTile(
@@ -205,7 +205,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
       
       // Làm mới danh sách sinh viên
       if (mounted) {
-        Provider.of<SinhVienViewModel>(context, listen: false).loadAllData();
+        Provider.of<StudentViewmodel>(context, listen: false).loadAllData();
       }
     }
   }
@@ -283,11 +283,11 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               decoration: BoxDecoration(
                 color: AppColors.primaryDark,
               ),
-              accountName: Text(currentUser?.hoTen ?? 'Người dùng'),
+              accountName: Text(currentUser?.full_name ?? 'Người dùng'),
               accountEmail: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(currentUser?.maSV ?? 'N/A'),
+                  Text(currentUser?.studentId ?? 'N/A'),
                   if (isAdmin)
                     Container(
                       margin: const EdgeInsets.only(top: 4),
@@ -308,7 +308,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               ),
               currentAccountPicture: UserAvatar(
                 avatarPath: currentUser?.avatarPath,
-                userName: currentUser?.hoTen ?? '?',
+                userName: currentUser?.full_name ?? '?',
                 radius: 40,
               ),
             ),
@@ -327,7 +327,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => const NganhManagementView(),
+                    builder: (context) => const MajorManagementView(),
                   ),
                 );
               },
@@ -352,7 +352,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
           ],
         ),
       ),
-      body: Consumer<SinhVienViewModel>(
+      body: Consumer<StudentViewmodel>(
         builder: (context, studentViewModel, child) {
           if (studentViewModel.isLoading) {
             return Center(
@@ -405,16 +405,16 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
 
           // Lọc bỏ ADMIN khỏi danh sách hiển thị
           var displayStudents = studentViewModel.students
-              .where((student) => student.maSV != 'ADMIN')
+              .where((student) => student.studentId != 'ADMIN')
               .toList();
           
           // Áp dụng search filter
           if (_searchQuery.isNotEmpty) {
             displayStudents = displayStudents.where((student) {
               final query = _searchQuery.toLowerCase();
-              return student.hoTen.toLowerCase().contains(query) ||
-                     (student.maSV?.toLowerCase().contains(query) ?? false) ||
-                     (student.soDT?.toLowerCase().contains(query) ?? false);
+              return student.full_name.toLowerCase().contains(query) ||
+                     (student.studentId?.toLowerCase().contains(query) ?? false) ||
+                     (student.phone_number?.toLowerCase().contains(query) ?? false);
             }).toList();
           }
 
@@ -507,14 +507,14 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                           itemCount: displayStudents.length,
                           itemBuilder: (context, index) {
                             final student = displayStudents[index];
-                            final canEdit = authViewModel.canEditStudent(student.maSV ?? '');
-                            final canDelete = authViewModel.canDeleteStudent(student.maSV ?? '');
+                            final canEdit = authViewModel.canEditStudent(student.studentId ?? '');
+                            final canDelete = authViewModel.canDeleteStudent(student.studentId ?? '');
 
                             return StudentCard(
                               student: student,
                               canEdit: canEdit,
                               canDelete: canDelete,
-                              onDelete: () => _confirmDeleteStudent(student.maSV ?? '', student.hoTen),
+                              onDelete: () => _confirmDeleteStudent(student.studentId ?? '', student.full_name),
                               onRefresh: () => studentViewModel.loadAllData(),
                             );
                           },
@@ -530,7 +530,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               scale: _fabAnimation,
               child: FloatingActionButton.extended(
                 onPressed: () {
-                  final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                  final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
                   Navigator.push(
                     context,
                     MaterialPageRoute(

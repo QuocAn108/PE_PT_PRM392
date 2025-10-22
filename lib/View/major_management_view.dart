@@ -5,19 +5,19 @@ import '../../ViewModel/Services/auth_viewmodel.dart';
 import '../ViewModel/Services/student_viewmodel.dart';
 import '../../Utils/app_colors.dart';
 
-class NganhManagementView extends StatefulWidget {
-  const NganhManagementView({super.key});
+class MajorManagementView extends StatefulWidget {
+  const MajorManagementView({super.key});
 
   @override
-  State<NganhManagementView> createState() => _NganhManagementViewState();
+  State<MajorManagementView> createState() => _MajorManagementViewState();
 }
 
-class _NganhManagementViewState extends State<NganhManagementView> {
+class _MajorManagementViewState extends State<MajorManagementView> {
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SinhVienViewModel>(context, listen: false).fetchNganhs();
+      Provider.of<StudentViewmodel>(context, listen: false).fetchMajors();
     });
   }
 
@@ -78,7 +78,7 @@ class _NganhManagementViewState extends State<NganhManagementView> {
             ElevatedButton(
               onPressed: () async {
                 if (formKey.currentState?.validate() ?? false) {
-                  final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                  final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
                   final scaffoldMessenger = ScaffoldMessenger.of(context);
                   final navigator = Navigator.of(dialogContext);
                   
@@ -119,13 +119,13 @@ class _NganhManagementViewState extends State<NganhManagementView> {
     );
   }
 
-  void _confirmDelete(Major nganh) {
+  void _confirmDelete(Major major) {
     showDialog(
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
           title: const Text('Xác Nhận Xóa'),
-          content: Text('Bạn có chắc chắn muốn xóa ngành "${nganh.name}"?\n\nLưu ý: Các sinh viên thuộc ngành này sẽ có MaNganh = NULL.'),
+          content: Text('Bạn có chắc chắn muốn xóa ngành "${major.name}"?\n\nLưu ý: Các sinh viên thuộc ngành này sẽ có MaNganh = NULL.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
@@ -133,11 +133,11 @@ class _NganhManagementViewState extends State<NganhManagementView> {
             ),
             ElevatedButton(
               onPressed: () async {
-                final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+                final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
                 final scaffoldMessenger = ScaffoldMessenger.of(context);
                 final navigator = Navigator.of(dialogContext);
                 
-                await viewModel.deleteNganh(nganh.id);
+                await viewModel.deleteNganh(major.id);
 
                 navigator.pop();
                 scaffoldMessenger.showSnackBar(
@@ -168,13 +168,13 @@ class _NganhManagementViewState extends State<NganhManagementView> {
         title: Text(isAdmin ? 'Quản Lý Ngành' : 'Danh Sách Ngành'),
         elevation: 0,
       ),
-      body: Consumer<SinhVienViewModel>(
+      body: Consumer<StudentViewmodel>(
         builder: (context, viewModel, child) {
           if (viewModel.isLoading) {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (viewModel.nganhs.isEmpty) {
+          if (viewModel.majors.isEmpty) {
             return Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -207,9 +207,9 @@ class _NganhManagementViewState extends State<NganhManagementView> {
 
           return ListView.builder(
             padding: const EdgeInsets.all(8),
-            itemCount: viewModel.nganhs.length,
+            itemCount: viewModel.majors.length,
             itemBuilder: (context, index) {
-              final nganh = viewModel.nganhs[index];
+              final major = viewModel.majors[index];
               return Card(
                 margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 elevation: 2,
@@ -230,14 +230,14 @@ class _NganhManagementViewState extends State<NganhManagementView> {
                     ),
                   ),
                   title: Text(
-                    nganh.name,
+                    major.name,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),
                   ),
                   subtitle: Text(
-                    'Mã: ${nganh.id}',
+                    'Mã: ${major.id}',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                     ),
@@ -248,12 +248,12 @@ class _NganhManagementViewState extends State<NganhManagementView> {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.edit, color: Colors.blue),
-                              onPressed: () => _showAddEditDialog(nganh: nganh),
+                              onPressed: () => _showAddEditDialog(nganh: major),
                               tooltip: 'Chỉnh sửa',
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _confirmDelete(nganh),
+                              onPressed: () => _confirmDelete(major),
                               tooltip: 'Xóa',
                             ),
                           ],

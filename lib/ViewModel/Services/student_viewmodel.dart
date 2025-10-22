@@ -11,19 +11,19 @@ import '../../Repository/major_repository.dart';
 import '../../Repository/student_repository.dart';
 import '../../Repository/account_repository.dart';
 
-class SinhVienViewModel extends ChangeNotifier {
+class StudentViewmodel extends ChangeNotifier {
   final StudentRepository _studentRepo = StudentRepository();
-  final MajorRepository _nganhRepo = MajorRepository();
+  final MajorRepository _majorRepo = MajorRepository();
   final AuthRepository _authRepo = AuthRepository();
   final ImagePicker _picker = ImagePicker();
 
   List<Student> _students = [];
-  List<Major> _nganhs = [];
+  List<Major> _majors = [];
   bool _isLoading = false;
   File? _pickedImage;
 
   List<Student> get students => _students;
-  List<Major> get nganhs => _nganhs;
+  List<Major> get majors => _majors;
   bool get isLoading => _isLoading;
   File? get pickedImage => _pickedImage;
 
@@ -33,7 +33,7 @@ class SinhVienViewModel extends ChangeNotifier {
 
     await Future.wait([
       fetchStudents(),
-      fetchNganhs(),
+      fetchMajors(),
     ]);
 
     _isLoading = false;
@@ -49,9 +49,9 @@ class SinhVienViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchNganhs() async {
+  Future<void> fetchMajors() async {
     try {
-      _nganhs = await _nganhRepo.getAllMajors();
+      _majors = await _majorRepo.getAllMajors();
     } catch (e) {
       debugPrint("Lỗi khi tải danh sách ngành: $e");
     }
@@ -65,18 +65,18 @@ class SinhVienViewModel extends ChangeNotifier {
 
   // --- Nganh Management ---
   Future<void> addNganh(Major nganh) async {
-    await _nganhRepo.insertMajor(nganh);
-    await fetchNganhs();
+    await _majorRepo.insertMajor(nganh);
+    await fetchMajors();
   }
 
   Future<void> updateNganh(Major nganh) async {
-    await _nganhRepo.updateMajor(nganh);
-    await fetchNganhs();
+    await _majorRepo.updateMajor(nganh);
+    await fetchMajors();
   }
 
   Future<void> deleteNganh(String maNganh) async {
-    await _nganhRepo.deleteMajor(maNganh);
-    await fetchNganhs();
+    await _majorRepo.deleteMajor(maNganh);
+    await fetchMajors();
   }
 
   void clearPickedImage() {

@@ -29,7 +29,7 @@ class _RegisterViewState extends State<RegisterView> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<SinhVienViewModel>(context, listen: false).fetchNganhs();
+      Provider.of<StudentViewmodel>(context, listen: false).fetchMajors();
     });
   }
 
@@ -86,7 +86,7 @@ class _RegisterViewState extends State<RegisterView> {
   @override
   Widget build(BuildContext context) {
     final isLoading = context.watch<AuthViewModel>().isLoading;
-    final studentViewModel = context.watch<SinhVienViewModel>();
+    final studentViewModel = context.watch<StudentViewmodel>();
 
     return Scaffold(
       body: Container(
@@ -174,12 +174,12 @@ class _RegisterViewState extends State<RegisterView> {
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
-                          items: studentViewModel.nganhs.isEmpty 
+                          items: studentViewModel.majors.isEmpty
                             ? null 
-                            : studentViewModel.nganhs.map((nganh) {
+                            : studentViewModel.majors.map((nganh) {
                                 return DropdownMenuItem(
-                                  value: nganh.maNganh,
-                                  child: Text(nganh.tenNganh),
+                                  value: nganh.majorId,
+                                  child: Text(nganh.majorName),
                                 );
                               }).toList(),
                           onChanged: (value) {

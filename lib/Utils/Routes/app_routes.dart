@@ -15,7 +15,7 @@ class AppRoutes {
       login: (context) => const LoginView(),
       home: (context) => const AuthWrapper(),
       studentManage: (context) => const StudentListView(),
-      majorManage: (context) => const NganhManagementView(),
+      majorManage: (context) => const MajorManagementView(),
     };
   }
 
@@ -28,7 +28,7 @@ class AppRoutes {
       case studentManage:
         return MaterialPageRoute(builder: (_) => const StudentListView());
       case majorManage:
-        return MaterialPageRoute(builder: (_) => const NganhManagementView());
+        return MaterialPageRoute(builder: (_) => const MajorManagementView());
       default:
         return MaterialPageRoute(
           builder: (_) => Scaffold(

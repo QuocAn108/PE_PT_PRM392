@@ -32,19 +32,19 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     super.initState();
     _isEditing = widget.student != null;
     
-    _maSVController = TextEditingController(text: widget.student?.maSV ?? '');
-    _hoTenController = TextEditingController(text: widget.student?.hoTen ?? '');
-    _diaChiController = TextEditingController(text: widget.student?.diaChi ?? '');
-    _soDTController = TextEditingController(text: widget.student?.soDT ?? '');
+    _maSVController = TextEditingController(text: widget.student?.studentId ?? '');
+    _hoTenController = TextEditingController(text: widget.student?.full_name ?? '');
+    _diaChiController = TextEditingController(text: widget.student?.addresss ?? '');
+    _soDTController = TextEditingController(text: widget.student?.phone_number ?? '');
     _selectedMaNganh = widget.student?.maNganh;
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
-      final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+      final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       
       // Kiểm tra quyền nếu đang edit
       if (_isEditing && widget.student != null) {
-        _hasPermission = authViewModel.canEditStudent(widget.student!.maSV ?? '');
+        _hasPermission = authViewModel.canEditStudent(widget.student!.studentId ?? '');
         if (!_hasPermission) {
           // Không có quyền, quay lại
           Navigator.pop(context);
@@ -58,19 +58,19 @@ class _StudentDetailViewState extends State<StudentDetailView> {
         }
 
         // Fetch latest student data to ensure the form shows current data
-        final latestStudent = await viewModel.getStudentById(widget.student!.maSV ?? '');
+        final latestStudent = await viewModel.getStudentById(widget.student!.studentId ?? '');
         if (latestStudent != null && mounted) {
           setState(() {
-            _maSVController.text = latestStudent.maSV ?? '';
-            _hoTenController.text = latestStudent.hoTen;
-            _diaChiController.text = latestStudent.diaChi ?? '';
-            _soDTController.text = latestStudent.soDT ?? '';
+            _maSVController.text = latestStudent.studentId ?? '';
+            _hoTenController.text = latestStudent.full_name;
+            _diaChiController.text = latestStudent.addresss ?? '';
+            _soDTController.text = latestStudent.phone_number ?? '';
             _selectedMaNganh = latestStudent.maNganh;
           });
         }
       }
       
-      viewModel.fetchNganhs();
+      viewModel.fetchMajors();
       viewModel.clearPickedImage();
     });
   }
@@ -97,7 +97,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
               title: const Text('Chụp ảnh'),
               onTap: () async {
                 Navigator.pop(context);
-                await Provider.of<SinhVienViewModel>(context, listen: false)
+                await Provider.of<StudentViewmodel>(context, listen: false)
                     .pickImageFromCamera();
               },
             ),
@@ -106,7 +106,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
               title: const Text('Chọn từ thư viện'),
               onTap: () async {
                 Navigator.pop(context);
-                await Provider.of<SinhVienViewModel>(context, listen: false)
+                await Provider.of<StudentViewmodel>(context, listen: false)
                     .pickImageFromGallery();
               },
             ),
@@ -117,7 +117,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
   }
 
   Future<void> _pickContactPhone() async {
-    final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+    final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
     final phone = await viewModel.pickContactPhone();
     if (phone != null) {
       setState(() {
@@ -128,12 +128,12 @@ class _StudentDetailViewState extends State<StudentDetailView> {
 
   Future<void> _saveStudent() async {
     if (_formKey.currentState?.validate() ?? false) {
-      final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
+      final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       
       // Kiểm tra quyền trước khi lưu
       if (_isEditing && widget.student != null) {
-        if (!authViewModel.canEditStudent(widget.student!.maSV ?? '')) {
+        if (!authViewModel.canEditStudent(widget.student!.studentId ?? '')) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Bạn không có quyền chỉnh sửa sinh viên này!'),
@@ -190,7 +190,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
   }
 
   Widget _buildAvatar() {
-    final viewModel = context.watch<SinhVienViewModel>();
+    final viewModel = context.watch<StudentViewmodel>();
     
     if (viewModel.pickedImage != null) {
       return CircleAvatar(
@@ -221,7 +221,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
 
   @override
   Widget build(BuildContext context) {
-    final viewModel = context.watch<SinhVienViewModel>();
+    final viewModel = context.watch<StudentViewmodel>();
 
     return Scaffold(
       appBar: AppBar(
@@ -270,7 +270,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                           Stack(
                             children: [
                               Hero(
-                                tag: _isEditing ? 'avatar_${widget.student?.maSV}' : 'new_avatar',
+                                tag: _isEditing ? 'avatar_${widget.student?.studentId}' : 'new_avatar',
                                 child: Container(
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
@@ -417,12 +417,12 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                       borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
                                     ),
                                   ),
-                                  items: viewModel.nganhs.isEmpty 
+                                  items: viewModel.majors.isEmpty
                                     ? null 
-                                    : viewModel.nganhs.map((nganh) {
+                                    : viewModel.majors.map((nganh) {
                                         return DropdownMenuItem(
-                                          value: nganh.maNganh,
-                                          child: Text(nganh.tenNganh),
+                                          value: nganh.majorId,
+                                          child: Text(nganh.majorName),
                                         );
                                       }).toList(),
                                   onChanged: (value) {

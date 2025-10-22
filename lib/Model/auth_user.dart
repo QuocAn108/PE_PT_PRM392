@@ -11,8 +11,8 @@ class AuthUser {
   });
 
   // Các getter tiện dụng
-  String? get maSV => student.id;
-  String get hoTen => student.fullName;
+  String? get studentId => student.id;
+  String get fullName => student.fullName;
   String? get avatarPath => student.avatarPath;
 
   // Check role

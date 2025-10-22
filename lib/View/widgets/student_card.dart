@@ -55,7 +55,7 @@ class StudentCard extends StatelessWidget {
               children: [
                 // Avatar with badge
                 Hero(
-                  tag: 'avatar_${student.maSV ?? ''}',
+                  tag: 'avatar_${student.studentId ?? ''}',
                   child: Container(
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
@@ -69,7 +69,7 @@ class StudentCard extends StatelessWidget {
                     ),
                     child: UserAvatar(
                       avatarPath: student.avatarPath,
-                      userName: student.hoTen,
+                      userName: student.full_name,
                     ),
                   ),
                 ),
@@ -81,7 +81,7 @@ class StudentCard extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        student.hoTen,
+                        student.full_name,
                         style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 17,
@@ -98,7 +98,7 @@ class StudentCard extends StatelessWidget {
                           ),
                           const SizedBox(width: 4),
                           Text(
-                            student.maSV ?? '',
+                            student.studentId ?? '',
                             style: TextStyle(
                               fontSize: 13,
                               color: Colors.grey.shade600,
@@ -107,7 +107,7 @@ class StudentCard extends StatelessWidget {
                           ),
                         ],
                       ),
-                      if (student.soDT != null) ...[
+                      if (student.phone_number != null) ...[
                         const SizedBox(height: 4),
                         Row(
                           children: [
@@ -118,7 +118,7 @@ class StudentCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 4),
                             Text(
-                              student.soDT!,
+                              student.phone_number!,
                               style: TextStyle(
                                 fontSize: 13,
                                 color: Colors.grey.shade600,
