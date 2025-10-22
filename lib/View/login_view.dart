@@ -76,10 +76,15 @@ class _LoginViewState extends State<LoginView> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Icon(
-                          Icons.school,
-                          size: 80,
-                          color: AppColors.primaryDark,
+                        // Use app logo image instead of icon
+                        ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Image.asset(
+                            'lib/Resources/images/logoPE.png',
+                            width: 80,
+                            height: 80,
+                            fit: BoxFit.cover,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Text(

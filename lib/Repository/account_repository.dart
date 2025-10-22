@@ -25,18 +25,18 @@ class AuthRepository {
     return null;
   }
 
-  Future<bool> register(Student student, String password) async {
+  Future<bool> register(Student student, String password, [UserRole role = UserRole.student]) async {
     final existingAccount = await _accountDao.getById(student.id!);
     if (existingAccount != null) {
       return false;
     }
 
-    // Create account with default role = student
+    // Create account with provided role (default = student)
     Account newAccount = Account(
       username: student.id!,
       password: password,
       studentId: student.id!,
-      role: 'student',
+      role: role.toDbString(),
     );
 
     await _studentDao.insert(student);

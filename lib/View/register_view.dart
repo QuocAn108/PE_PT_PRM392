@@ -4,6 +4,7 @@ import '../../Model/student.dart';
 import '../../ViewModel/Services/auth_viewmodel.dart';
 import '../../ViewModel/Services/student_viewmodel.dart';
 import '../Utils/app_colors.dart';
+import '../../Model/user_role.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -22,6 +23,8 @@ class _RegisterViewState extends State<RegisterView> {
   final _confirmPasswordController = TextEditingController();
   
   String? _selectedMaNganh;
+  // New: role selection (default to Student)
+  UserRole _selectedRole = UserRole.student;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
@@ -57,9 +60,11 @@ class _RegisterViewState extends State<RegisterView> {
         avatarPath: null,
       );
 
+      // Pass selected role to registration
       final success = await authViewModel.register(
         newStudent,
         _passwordController.text,
+        _selectedRole,
       );
 
       if (mounted) {
@@ -189,7 +194,32 @@ class _RegisterViewState extends State<RegisterView> {
                           },
                         ),
                         const SizedBox(height: 16),
-                        
+
+                        // Role selection
+                        DropdownButtonFormField<UserRole>(
+                          value: _selectedRole,
+                          decoration: InputDecoration(
+                            labelText: 'Role',
+                            prefixIcon: const Icon(Icons.verified_user),
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          items: UserRole.values.map((role) {
+                            return DropdownMenuItem(
+                              value: role,
+                              child: Text(role.displayName),
+                            );
+                          }).toList(),
+                          onChanged: (value) {
+                            if (value == null) return;
+                            setState(() {
+                              _selectedRole = value;
+                            });
+                          },
+                        ),
+                        const SizedBox(height: 16),
+
                         // Password
                         TextFormField(
                           controller: _passwordController,

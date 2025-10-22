@@ -54,13 +54,13 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  Future<bool> register(Student sv, String password) async {
+  Future<bool> register(Student sv, String password, [UserRole role = UserRole.student]) async {
     _isLoading = true;
     _errorMessage = null;
     notifyListeners();
 
     try {
-      final success = await _authRepository.register(sv, password);
+      final success = await _authRepository.register(sv, password, role);
       if (success) {
         _isLoading = false;
         notifyListeners();
