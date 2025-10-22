@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 
+import '../../Utils/app_colors.dart';
+
 class UserAvatar extends StatelessWidget {
   final String? avatarPath;
   final String userName;
@@ -24,7 +26,7 @@ class UserAvatar extends StatelessWidget {
     } else {
       return CircleAvatar(
         radius: radius,
-        backgroundColor: Colors.blue.shade200,
+        backgroundColor: AppColors.primaryLight,
         child: Text(
           userName.isNotEmpty ? userName[0].toUpperCase() : '?',
           style: TextStyle(

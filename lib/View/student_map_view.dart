@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geocoding/geocoding.dart';
+import '../../Utils/app_colors.dart';
 
 class StudentMapView extends StatefulWidget {
   final String address;
@@ -106,7 +107,7 @@ class _StudentMapViewState extends State<StudentMapView> {
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: AppColors.primaryDark,
         actions: [
           if (!_isLoading && _errorMessage == null)
             PopupMenuButton<String>(
@@ -126,7 +127,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                         _selectedMapStyle == entry.key
                             ? Icons.radio_button_checked
                             : Icons.radio_button_unchecked,
-                        color: Colors.blue.shade600,
+                        color: AppColors.primary,
                       ),
                       const SizedBox(width: 12),
                       Text(entry.value['name']!),
@@ -150,13 +151,13 @@ class _StudentMapViewState extends State<StudentMapView> {
                         height: 80,
                         child: CircularProgressIndicator(
                           strokeWidth: 3,
-                          valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                          valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                         ),
                       ),
                       Icon(
                         Icons.location_searching,
                         size: 40,
-                        color: Colors.blue.shade600,
+                        color: AppColors.primary,
                       ),
                     ],
                   ),
@@ -235,7 +236,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                               horizontal: 32,
                               vertical: 16,
                             ),
-                            backgroundColor: Colors.blue.shade600,
+                            backgroundColor: AppColors.primary,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
@@ -300,8 +301,8 @@ class _StudentMapViewState extends State<StudentMapView> {
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
                                             colors: [
-                                              Colors.blue.shade600,
-                                              Colors.blue.shade400,
+                                              AppColors.primary,
+                                              AppColors.primaryLight,
                                             ],
                                           ),
                                           borderRadius: BorderRadius.circular(20),
@@ -349,7 +350,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                                         ),
                                         child: Icon(
                                           Icons.location_on,
-                                          color: Colors.red.shade600,
+                                          color: AppColors.primary,
                                           size: 36,
                                         ),
                                       ),
@@ -399,8 +400,8 @@ class _StudentMapViewState extends State<StudentMapView> {
                                           decoration: BoxDecoration(
                                             gradient: LinearGradient(
                                               colors: [
-                                                Colors.red.shade400,
-                                                Colors.red.shade600,
+                                                AppColors.primaryLight,
+                                                AppColors.primary,
                                               ],
                                             ),
                                             borderRadius: BorderRadius.circular(10),
@@ -515,7 +516,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                             icon: Icons.my_location,
                             onPressed: _recenterMap,
                             tooltip: 'Về trung tâm',
-                            color: Colors.blue.shade600,
+                            color: AppColors.primary,
                           ),
                         ),
 

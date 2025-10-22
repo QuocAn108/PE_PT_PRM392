@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../Model/major.dart';
 import '../../ViewModel/Services/auth_viewmodel.dart';
 import '../ViewModel/Services/student_viewmodel.dart';
+import '../../Utils/app_colors.dart';
 
 class NganhManagementView extends StatefulWidget {
   const NganhManagementView({super.key});
@@ -220,12 +221,12 @@ class _NganhManagementViewState extends State<NganhManagementView> {
                   leading: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
-                      color: Colors.blue.shade100,
+                      color: AppColors.primaryLight,
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
                       Icons.school,
-                      color: Colors.blue.shade700,
+                      color: AppColors.primaryDark,
                     ),
                   ),
                   title: Text(
@@ -269,7 +270,7 @@ class _NganhManagementViewState extends State<NganhManagementView> {
               onPressed: () => _showAddEditDialog(),
               icon: const Icon(Icons.add),
               label: const Text('Thêm Ngành'),
-              backgroundColor: Colors.blue.shade600,
+              backgroundColor: AppColors.primary,
             )
           : null,
     );

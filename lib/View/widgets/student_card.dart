@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../Model/student.dart';
+import '../../Utils/app_colors.dart';
 import '../student_detail_view.dart';
 import 'user_avatar.dart';
 
@@ -60,7 +61,7 @@ class StudentCard extends StatelessWidget {
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.blue.shade200,
+                          color: AppColors.primaryLight,
                           blurRadius: 8,
                           offset: const Offset(0, 2),
                         ),
@@ -93,7 +94,7 @@ class StudentCard extends StatelessWidget {
                           Icon(
                             Icons.badge,
                             size: 14,
-                            color: Colors.blue.shade400,
+                            color: AppColors.primaryLight,
                           ),
                           const SizedBox(width: 4),
                           Text(

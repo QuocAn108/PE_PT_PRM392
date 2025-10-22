@@ -84,7 +84,6 @@ class SinhVienViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-
   Future<void> saveStudent({
     required String maSV,
     required String hoTen,
@@ -212,5 +211,13 @@ class SinhVienViewModel extends ChangeNotifier {
 
     // Trả về null nếu không chọn hoặc bị từ chối quyền
     return null;
+  }
+
+  Future<Student?> getStudentById(String id) async {
+    try {
+      return await _studentRepo.getStudentById(id);
+    } catch (e) {
+      return null;
+    }
   }
 }

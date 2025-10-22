@@ -99,12 +99,24 @@ class AuthRepository {
 
     // Cập nhật mật khẩu mới
     Account updatedAccount = Account(
-      username: account.username,
+      username: username,
       password: newPassword,
       studentId: account.studentId,
       role: account.role,
     );
+
     await _accountDao.update(updatedAccount, username);
     return true;
+  }
+
+  /// Kiểm tra xem sinh viên có phải admin không
+  Future<bool> isStudentAdmin(String maSV) async {
+    if (maSV.isEmpty) return false;
+    try {
+      final account = await _accountDao.getById(maSV);
+      return account != null && account.role == 'admin';
+    } catch (e) {
+      return false;
+    }
   }
 }

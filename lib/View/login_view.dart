@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../ViewModel/Services/auth_viewmodel.dart';
 import 'register_view.dart';
+import '../../Utils/app_colors.dart';
 
 class LoginView extends StatefulWidget {
   const LoginView({super.key});
@@ -54,8 +55,8 @@ class _LoginViewState extends State<LoginView> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade400,
-              Colors.purple.shade300,
+              AppColors.primaryLight,
+              AppColors.primaryDark,
             ],
           ),
         ),
@@ -78,14 +79,14 @@ class _LoginViewState extends State<LoginView> {
                         Icon(
                           Icons.school,
                           size: 80,
-                          color: Theme.of(context).primaryColor,
+                          color: AppColors.primaryDark,
                         ),
                         const SizedBox(height: 16),
                         Text(
                           'Quản Lý Sinh Viên',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
-                            color: Colors.blue.shade700,
+                            color: AppColors.primary,
                           ),
                         ),
                         const SizedBox(height: 8),
@@ -147,7 +148,7 @@ class _LoginViewState extends State<LoginView> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor: Colors.blue.shade600,
+                                backgroundColor: AppColors.primaryLight,
                               ),
                               child: const Text(
                                 'Đăng Nhập',

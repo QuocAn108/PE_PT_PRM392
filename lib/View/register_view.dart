@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../Model/student.dart';
 import '../../ViewModel/Services/auth_viewmodel.dart';
 import '../../ViewModel/Services/student_viewmodel.dart';
+import '../Utils/app_colors.dart';
 
 class RegisterView extends StatefulWidget {
   const RegisterView({super.key});
@@ -94,8 +95,8 @@ class _RegisterViewState extends State<RegisterView> {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade400,
-              Colors.purple.shade300,
+              AppColors.primaryLight,
+              AppColors.primaryDark,
             ],
           ),
         ),
@@ -118,8 +119,7 @@ class _RegisterViewState extends State<RegisterView> {
                         Icon(
                           Icons.person_add,
                           size: 80,
-                          color: Theme.of(context).primaryColor,
-                        ),
+                          color: AppColors.primaryDark,                        ),
                         const SizedBox(height: 16),
                         Text(
                           'Đăng Ký Tài Khoản',
@@ -257,7 +257,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
-                                backgroundColor: Colors.blue.shade600,
+                                backgroundColor: AppColors.primaryLight,
                               ),
                               child: const Text(
                                 'Đăng Ký',

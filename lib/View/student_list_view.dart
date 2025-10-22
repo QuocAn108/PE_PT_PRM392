@@ -9,6 +9,7 @@ import 'widgets/change_password_dialog.dart';
 import 'widgets/student_card.dart';
 import 'widgets/user_avatar.dart';
 import 'widgets/empty_state.dart';
+import '../../Utils/app_colors.dart';
 
 class StudentListView extends StatefulWidget {
   const StudentListView({super.key});
@@ -111,7 +112,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
         return AlertDialog(
           title: Row(
             children: [
-              const Icon(Icons.settings, color: Colors.blue),
+              const Icon(Icons.settings, color: AppColors.primary),
               const SizedBox(width: 8),
               const Text('Cài Đặt Tài Khoản'),
             ],
@@ -135,7 +136,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               const Divider(),
               ListTile(
                 contentPadding: EdgeInsets.zero,
-                leading: const Icon(Icons.edit, color: Colors.blue),
+                leading: const Icon(Icons.edit, color: AppColors.primary),
                 title: const Text('Chỉnh sửa thông tin'),
                 subtitle: const Text('Cập nhật ảnh đại diện, số điện thoại,...'),
                 onTap: () {
@@ -263,7 +264,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: AppColors.primary,
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
@@ -280,7 +281,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
           children: [
             UserAccountsDrawerHeader(
               decoration: BoxDecoration(
-                color: Colors.blue.shade600,
+                color: AppColors.primaryDark,
               ),
               accountName: Text(currentUser?.hoTen ?? 'Người dùng'),
               accountEmail: Column(
@@ -292,7 +293,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                       margin: const EdgeInsets.only(top: 4),
                       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
                       decoration: BoxDecoration(
-                        color: Colors.orange,
+                        color: AppColors.primaryLight,
                         borderRadius: BorderRadius.circular(12),
                       ),
                       child: const Text(
@@ -360,7 +361,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 children: [
                   CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primaryDark),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -380,7 +381,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               icon: Icons.people_outline,
               title: 'Chưa có sinh viên nào',
               subtitle: 'Hãy thêm sinh viên đầu tiên',
-              iconColor: Colors.blue.shade300,
+              iconColor: AppColors.primaryLight,
               action: ElevatedButton.icon(
                 onPressed: () {
                   Navigator.push(
@@ -443,7 +444,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                   decoration: InputDecoration(
                     hintText: 'Tìm kiếm theo tên, mã SV, SĐT...',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
-                    prefixIcon: Icon(Icons.search, color: Colors.blue.shade400),
+                    prefixIcon: Icon(Icons.search, color: AppColors.primaryLight),
                     suffixIcon: _searchQuery.isNotEmpty
                         ? IconButton(
                             icon: Icon(Icons.clear, color: Colors.grey.shade400),
@@ -477,7 +478,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                             : 'Hãy thêm sinh viên đầu tiên',
                         iconColor: _searchQuery.isNotEmpty 
                             ? Colors.orange.shade300
-                            : Colors.blue.shade300,
+                            : AppColors.primaryLight,
                         action: (isAdmin && _searchQuery.isEmpty)
                             ? ElevatedButton.icon(
                                 onPressed: () {
@@ -545,7 +546,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),
                 ),
-                backgroundColor: Colors.blue.shade600,
+                backgroundColor: AppColors.primary,
               ),
             )
           : null,

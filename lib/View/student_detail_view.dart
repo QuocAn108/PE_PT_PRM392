@@ -5,6 +5,7 @@ import '../../Model/student.dart';
 import '../../ViewModel/Services/auth_viewmodel.dart';
 import '../../ViewModel/Services/student_viewmodel.dart';
 import 'student_map_view.dart';
+import '../../Utils/app_colors.dart';
 
 class StudentDetailView extends StatefulWidget {
   final Student? student;
@@ -37,7 +38,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     _soDTController = TextEditingController(text: widget.student?.soDT ?? '');
     _selectedMaNganh = widget.student?.maNganh;
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final viewModel = Provider.of<SinhVienViewModel>(context, listen: false);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       
@@ -54,6 +55,18 @@ class _StudentDetailViewState extends State<StudentDetailView> {
             ),
           );
           return;
+        }
+
+        // Fetch latest student data to ensure the form shows current data
+        final latestStudent = await viewModel.getStudentById(widget.student!.maSV ?? '');
+        if (latestStudent != null && mounted) {
+          setState(() {
+            _maSVController.text = latestStudent.maSV ?? '';
+            _hoTenController.text = latestStudent.hoTen;
+            _diaChiController.text = latestStudent.diaChi ?? '';
+            _soDTController.text = latestStudent.soDT ?? '';
+            _selectedMaNganh = latestStudent.maNganh;
+          });
         }
       }
       
@@ -141,6 +154,10 @@ class _StudentDetailViewState extends State<StudentDetailView> {
         isEditing: _isEditing,
       );
 
+      // Refresh the list and current user data
+      await viewModel.fetchStudents();
+      await authViewModel.refreshCurrentUser();
+
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
@@ -192,11 +209,11 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     } else {
       return CircleAvatar(
         radius: 60,
-        backgroundColor: Colors.blue.shade100,
+        backgroundColor: AppColors.primaryLight,
         child: Icon(
           Icons.person,
           size: 60,
-          color: Colors.blue.shade700,
+          color: AppColors.primaryLight,
         ),
       );
     }
@@ -213,7 +230,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
-        backgroundColor: Colors.blue.shade600,
+        backgroundColor: AppColors.primaryDark,
       ),
       body: viewModel.isLoading
           ? Center(
@@ -222,7 +239,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                 children: [
                   CircularProgressIndicator(
                     strokeWidth: 3,
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.blue.shade600),
+                    valueColor: AlwaysStoppedAnimation<Color>(AppColors.primary),
                   ),
                   const SizedBox(height: 16),
                   Text(
@@ -245,7 +262,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                     // Header with Avatar Section
                     Container(
                       decoration: BoxDecoration(
-                        color: Colors.blue.shade600,
+                        color: AppColors.primaryDark,
                       ),
                       child: Column(
                         children: [
@@ -325,7 +342,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                   decoration: InputDecoration(
                                     labelText: 'Mã Sinh Viên *',
                                     hintText: 'Nhập mã sinh viên',
-                                    prefixIcon: Icon(Icons.badge, color: Colors.blue.shade400),
+                                    prefixIcon: Icon(Icons.badge, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(
@@ -338,7 +355,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                                      borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
                                     ),
                                   ),
                                   enabled: !_isEditing,
@@ -355,7 +372,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                   decoration: InputDecoration(
                                     labelText: 'Họ và Tên *',
                                     hintText: 'Nhập họ và tên đầy đủ',
-                                    prefixIcon: Icon(Icons.person, color: Colors.blue.shade400),
+                                    prefixIcon: Icon(Icons.person, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(
@@ -368,7 +385,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                                      borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
                                     ),
                                   ),
                                   validator: (value) {
@@ -384,7 +401,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                   decoration: InputDecoration(
                                     labelText: 'Ngành',
                                     hintText: 'Chọn ngành học',
-                                    prefixIcon: Icon(Icons.school, color: Colors.blue.shade400),
+                                    prefixIcon: Icon(Icons.school, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
                                     border: OutlineInputBorder(
@@ -397,7 +414,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     ),
                                     focusedBorder: OutlineInputBorder(
                                       borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.blue.shade400, width: 2),
+                                      borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
                                     ),
                                   ),
                                   items: viewModel.nganhs.isEmpty 
@@ -500,12 +517,12 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                 ),
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(vertical: 18),
-                                  backgroundColor: Colors.blue.shade600,
+                                  backgroundColor: AppColors.primaryLight,
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   elevation: 4,
-                                  shadowColor: Colors.blue.shade300,
+                                  shadowColor: AppColors.primaryLight,
                                 ),
                               ),
                               const SizedBox(height: 20),
@@ -527,7 +544,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            color: Colors.blue.shade600,
+            color: AppColors.primary,
             borderRadius: BorderRadius.circular(10),
             boxShadow: [
               BoxShadow(

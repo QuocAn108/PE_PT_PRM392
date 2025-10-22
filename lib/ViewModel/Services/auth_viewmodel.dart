@@ -29,6 +29,13 @@ class AuthViewModel extends ChangeNotifier {
     try {
       final user = await _authRepository.login(username, password);
       if (user != null) {
+        // Kiểm tra quyền đăng nhập: chỉ admin mới được đăng nhập
+        if (user.role == UserRole.student) {
+          _errorMessage = "Không có quyền đăng nhập";
+          _isLoading = false;
+          notifyListeners();
+          return false;
+        }
         _loggedInUser = user;
         _isLoading = false;
         notifyListeners();
@@ -152,5 +159,10 @@ class AuthViewModel extends ChangeNotifier {
       notifyListeners();
       return false;
     }
+  }
+
+  /// Kiểm tra xem sinh viên có phải admin không
+  Future<bool> isStudentAdmin(String maSV) async {
+    return await _authRepository.isStudentAdmin(maSV);
   }
 }
