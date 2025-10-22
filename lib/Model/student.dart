@@ -1,34 +1,52 @@
+import 'package:flutter_contacts/flutter_contacts.dart';
+
 import '../Model/base_model.dart';
 
 class Student extends BaseModel {
-  final int id;
-  final String name;
-  final String email;
-  final String phone;
+  final String? id;
+  final String fullName;
+  final String? majorId;
+  final String? address;
+  final String? phoneNumber;
+  final String? avatarPath;
 
   Student({
-    required this.id,
-    required this.name,
-    required this.email,
-    required this.phone,
+    this.id,
+    required this.fullName,
+    this.majorId,
+    this.address,
+    this.phoneNumber,
+    this.avatarPath,
   });
+
+  // Compatibility getters
+  String? get studentId => id;
+  String get full_name => fullName;
+  String? get addresss => address;
+  String? get phone_number => phoneNumber;
+  String? get maNganh => majorId;
 
   @override
   Map<String, dynamic> toJson() {
-    return {
-      'id': id,
-      'name': name,
-      'email': email,
-      'phone': phone,
+    final map = <String, dynamic>{
+      'FullName': fullName,
     };
+    if (id != null) map['Id'] = id;
+    if (address != null) map['Address'] = address;
+    if (phoneNumber != null) map['PhoneNumber'] = phoneNumber;
+    if (avatarPath != null) map['AvatarPath'] = avatarPath;
+    if (majorId != null) map['MajorId'] = majorId;
+    return map;
   }
 
   factory Student.fromJson(Map<String, dynamic> json) {
     return Student(
-      id: json['id'],
-      name: json['name'],
-      email: json['email'],
-      phone: json['phone'],
+      id: json['Id'] == null ? null : json['Id'].toString(),
+      fullName: json['FullName'],
+      majorId: json['MajorId'],
+      address: json['Address'],
+      phoneNumber: json['PhoneNumber'],
+      avatarPath: json['AvatarPath'],
     );
   }
 }

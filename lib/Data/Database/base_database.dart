@@ -9,20 +9,22 @@ abstract class BaseDatabase {
 
   Future<Database> get database async {
     if (_database != null) return _database!;
-    _database = await _initDatabase();
+    _database = await initDatabase();
     return _database!;
   }
 
-  Future<Database> _initDatabase() async {
+  // made public so subclasses (in other files) can override to customize initialization
+  Future<Database> initDatabase() async {
     String path = join(await getDatabasesPath(), databaseName);
     return await openDatabase(
       path,
       version: databaseVersion,
-      onCreate: _onCreate,
-      onUpgrade: _onUpgrade,
+      onCreate: onCreate,
+      onUpgrade: onUpgrade,
     );
   }
 
-  Future<void> _onCreate(Database db, int version);
-  Future<void> _onUpgrade(Database db, int oldVersion, int newVersion);
+  // Public lifecycle methods so subclasses can override them across files
+  Future<void> onCreate(Database db, int version);
+  Future<void> onUpgrade(Database db, int oldVersion, int newVersion);
 }
