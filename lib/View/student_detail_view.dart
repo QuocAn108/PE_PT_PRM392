@@ -223,6 +223,26 @@ class _StudentDetailViewState extends State<StudentDetailView> {
   Widget build(BuildContext context) {
     final viewModel = context.watch<StudentViewmodel>();
 
+    // Build dropdown items for majors. If the student's selected major was deleted,
+    // insert a fallback item so DropdownButtonFormField.value is always present among items.
+    final List<DropdownMenuItem<String>> _majorItems = viewModel.majors
+        .map((nganh) => DropdownMenuItem(
+              value: nganh.majorId,
+              child: Text(nganh.majorName),
+            ))
+        .toList();
+
+    if (_selectedMaNganh != null && !_majorItems.any((it) => it.value == _selectedMaNganh)) {
+      // Show a deleted/unknown major label in red so user knows the major no longer exists
+      _majorItems.insert(
+        0,
+        DropdownMenuItem(
+          value: _selectedMaNganh,
+          child: Text('Deleted major', style: TextStyle(color: Colors.red)),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text(
@@ -277,7 +297,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     border: Border.all(color: Colors.white, width: 4),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Color.fromRGBO(0, 0, 0, 0.2),
                                         blurRadius: 20,
                                         offset: const Offset(0, 10),
                                       ),
@@ -296,7 +316,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     border: Border.all(color: Colors.white, width: 3),
                                     boxShadow: [
                                       BoxShadow(
-                                        color: Colors.black.withOpacity(0.2),
+                                        color: Color.fromRGBO(0, 0, 0, 0.2),
                                         blurRadius: 8,
                                         offset: const Offset(0, 2),
                                       ),
@@ -397,40 +417,33 @@ class _StudentDetailViewState extends State<StudentDetailView> {
 
                                 // Major
                                 DropdownButtonFormField<String>(
-                                  value: _selectedMaNganh,
-                                  decoration: InputDecoration(
-                                    labelText: 'Major',
-                                    hintText: 'Select major',
-                                    prefixIcon: Icon(Icons.school, color: AppColors.primaryLight),
-                                    filled: true,
-                                    fillColor: Colors.white,
-                                    border: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide.none,
-                                    ),
-                                    enabledBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: Colors.grey.shade200),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderRadius: BorderRadius.circular(12),
-                                      borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
-                                    ),
-                                  ),
-                                  items: viewModel.majors.isEmpty
-                                    ? null 
-                                    : viewModel.majors.map((nganh) {
-                                        return DropdownMenuItem(
-                                          value: nganh.majorId,
-                                          child: Text(nganh.majorName),
-                                        );
-                                      }).toList(),
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _selectedMaNganh = value;
-                                    });
-                                  },
-                                ),
+                                  initialValue: _selectedMaNganh,
+                                   decoration: InputDecoration(
+                                     labelText: 'Major',
+                                     hintText: 'Select major',
+                                     prefixIcon: Icon(Icons.school, color: AppColors.primaryLight),
+                                     filled: true,
+                                     fillColor: Colors.white,
+                                     border: OutlineInputBorder(
+                                       borderRadius: BorderRadius.circular(12),
+                                       borderSide: BorderSide.none,
+                                     ),
+                                     enabledBorder: OutlineInputBorder(
+                                       borderRadius: BorderRadius.circular(12),
+                                       borderSide: BorderSide(color: Colors.grey.shade200),
+                                     ),
+                                     focusedBorder: OutlineInputBorder(
+                                       borderRadius: BorderRadius.circular(12),
+                                       borderSide: BorderSide(color: AppColors.primaryLight, width: 2),
+                                     ),
+                                   ),
+                                   items: _majorItems.isEmpty ? null : _majorItems,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _selectedMaNganh = value;
+                                      });
+                                    },
+                                 ),
                               ]),
                               
                               const SizedBox(height: 24),

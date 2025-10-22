@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_contacts/flutter_contacts.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as path;
 import '../../Model/major.dart';
@@ -75,8 +74,18 @@ class StudentViewmodel extends ChangeNotifier {
   }
 
   Future<void> deleteNganh(String maNganh) async {
+    try {
+      // Clear major references in students first so no student points to a deleted major
+      await _studentRepo.clearMajorReferences(maNganh);
+    } catch (e) {
+      debugPrint('Failed to clear major references from students: $e');
+      // proceed to attempt delete anyway
+    }
+
     await _majorRepo.deleteMajor(maNganh);
+    // Refresh both students and majors so UI shows up-to-date data
     await fetchMajors();
+    await fetchStudents();
   }
 
   void clearPickedImage() {

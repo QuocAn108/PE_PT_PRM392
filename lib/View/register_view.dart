@@ -166,7 +166,7 @@ class _RegisterViewState extends State<RegisterView> {
                         
                         // Major
                         DropdownButtonFormField<String>(
-                          value: _selectedMaNganh,
+                          initialValue: _selectedMaNganh,
                           decoration: InputDecoration(
                             labelText: 'Major',
                             prefixIcon: const Icon(Icons.school),

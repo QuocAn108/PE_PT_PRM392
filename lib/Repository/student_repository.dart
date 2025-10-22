@@ -35,4 +35,9 @@ class StudentRepository {
   Future<int> deleteStudent(String id) async {
     return await _dao.delete(id);
   }
+
+  // Clear MajorId for students that reference the provided majorId.
+  Future<int> clearMajorReferences(String majorId) async {
+    return await _dao.clearMajorFromStudents(majorId);
+  }
 }
