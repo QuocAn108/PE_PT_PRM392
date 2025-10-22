@@ -122,7 +122,7 @@ class _RegisterViewState extends State<RegisterView> {
                           color: AppColors.primaryDark,                        ),
                         const SizedBox(height: 16),
                         Text(
-                          'Đăng Ký Tài Khoản',
+                          'Register Account',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: Colors.blue.shade700,
@@ -130,18 +130,18 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Mã SV
+                        // Student ID
                         TextFormField(
                           controller: _maSVController,
                           decoration: InputDecoration(
-                            labelText: 'Mã Sinh Viên',
+                            labelText: 'Student ID',
                             prefixIcon: const Icon(Icons.badge),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           validator: (value) {
-                            if (value?.isEmpty ?? true) return 'Vui lòng nhập mã sinh viên';
+                            if (value?.isEmpty ?? true) return 'Please enter student ID';
                             return null;
                           },
                         ),
@@ -151,24 +151,24 @@ class _RegisterViewState extends State<RegisterView> {
                         TextFormField(
                           controller: _hoTenController,
                           decoration: InputDecoration(
-                            labelText: 'Họ và Tên',
+                            labelText: 'Full Name',
                             prefixIcon: const Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
                           ),
                           validator: (value) {
-                            if (value?.isEmpty ?? true) return 'Vui lòng nhập họ tên';
+                            if (value?.isEmpty ?? true) return 'Please enter full name';
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         
-                        // Ngành
+                        // Major
                         DropdownButtonFormField<String>(
                           value: _selectedMaNganh,
                           decoration: InputDecoration(
-                            labelText: 'Ngành',
+                            labelText: 'Major',
                             prefixIcon: const Icon(Icons.school),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
@@ -190,12 +190,12 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Mật khẩu
+                        // Password
                         TextFormField(
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
-                            labelText: 'Mật Khẩu',
+                            labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
@@ -210,19 +210,19 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                           ),
                           validator: (value) {
-                            if (value?.isEmpty ?? true) return 'Vui lòng nhập mật khẩu';
-                            if (value!.length < 3) return 'Mật khẩu phải có ít nhất 3 ký tự';
+                            if (value?.isEmpty ?? true) return 'Please enter password';
+                            if (value!.length < 3) return 'Password must be at least 3 characters';
                             return null;
                           },
                         ),
                         const SizedBox(height: 16),
                         
-                        // Xác nhận mật khẩu
+                        // Confirm Password
                         TextFormField(
                           controller: _confirmPasswordController,
                           obscureText: _obscureConfirmPassword,
                           decoration: InputDecoration(
-                            labelText: 'Xác Nhận Mật Khẩu',
+                            labelText: 'Confirm Password',
                             prefixIcon: const Icon(Icons.lock_outline),
                             suffixIcon: IconButton(
                               icon: Icon(_obscureConfirmPassword ? Icons.visibility : Icons.visibility_off),
@@ -237,8 +237,8 @@ class _RegisterViewState extends State<RegisterView> {
                             ),
                           ),
                           validator: (value) {
-                            if (value?.isEmpty ?? true) return 'Vui lòng xác nhận mật khẩu';
-                            if (value != _passwordController.text) return 'Mật khẩu không khớp';
+                            if (value?.isEmpty ?? true) return 'Please confirm password';
+                            if (value != _passwordController.text) return 'Passwords do not match';
                             return null;
                           },
                         ),
@@ -260,7 +260,7 @@ class _RegisterViewState extends State<RegisterView> {
                                 backgroundColor: AppColors.primaryLight,
                               ),
                               child: const Text(
-                                'Đăng Ký',
+                                'Register',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
                               ),
                             ),
@@ -271,13 +271,13 @@ class _RegisterViewState extends State<RegisterView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text('Đã có tài khoản? '),
+                            const Text('Already have account? '),
                             TextButton(
                               onPressed: () {
                                 Navigator.pop(context);
                               },
                               child: const Text(
-                                'Đăng nhập ngay',
+                                'Login now',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),

@@ -36,7 +36,7 @@ class _LoginViewState extends State<LoginView> {
       if (!success && mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(authViewModel.errorMessage ?? "Đăng nhập thất bại"),
+            content: Text(authViewModel.errorMessage ?? "Login failed"),
             backgroundColor: Colors.red,
           ),
         );
@@ -83,7 +83,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 16),
                         Text(
-                          'Quản Lý Sinh Viên',
+                          'Student Management',
                           style: Theme.of(context).textTheme.headlineSmall?.copyWith(
                             fontWeight: FontWeight.bold,
                             color: AppColors.primary,
@@ -91,7 +91,7 @@ class _LoginViewState extends State<LoginView> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Đăng nhập vào hệ thống',
+                          'Log in to the system',
                           style: TextStyle(
                             color: Colors.grey.shade600,
                             fontSize: 14,
@@ -102,14 +102,14 @@ class _LoginViewState extends State<LoginView> {
                         TextFormField(
                           controller: _usernameController,
                           decoration: InputDecoration(
-                            labelText: 'Tên đăng nhập',
+                            labelText: 'Username',
                             prefixIcon: const Icon(Icons.person),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            hintText: 'Nhập mã sinh viên',
+                            hintText: 'Enter student ID',
                           ),
-                          validator: (value) => (value?.isEmpty ?? true) ? "Không được để trống" : null,
+                          validator: (value) => (value?.isEmpty ?? true) ? "Cannot be empty" : null,
                         ),
                         const SizedBox(height: 16),
                         
@@ -117,7 +117,7 @@ class _LoginViewState extends State<LoginView> {
                           controller: _passwordController,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
-                            labelText: 'Mật khẩu',
+                            labelText: 'Password',
                             prefixIcon: const Icon(Icons.lock),
                             suffixIcon: IconButton(
                               icon: Icon(_obscurePassword ? Icons.visibility : Icons.visibility_off),
@@ -130,9 +130,9 @@ class _LoginViewState extends State<LoginView> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            hintText: 'Nhập mật khẩu',
+                            hintText: 'Enter password',
                           ),
-                          validator: (value) => (value?.isEmpty ?? true) ? "Không được để trống" : null,
+                          validator: (value) => (value?.isEmpty ?? true) ? "Cannot be empty" : null,
                         ),
                         const SizedBox(height: 24),
                         
@@ -151,7 +151,7 @@ class _LoginViewState extends State<LoginView> {
                                 backgroundColor: AppColors.primaryLight,
                               ),
                               child: const Text(
-                                'Đăng Nhập',
+                                'Login',
                                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold,color: Colors.white),
                               ),
                             ),
@@ -161,7 +161,7 @@ class _LoginViewState extends State<LoginView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const Text('Chưa có tài khoản? '),
+                            const Text('Don\'t have an account? '),
                             TextButton(
                               onPressed: () {
                                 Navigator.push(
@@ -172,7 +172,7 @@ class _LoginViewState extends State<LoginView> {
                                 );
                               },
                               child: const Text(
-                                'Đăng ký ngay',
+                                'Register now',
                                 style: TextStyle(fontWeight: FontWeight.bold),
                               ),
                             ),
