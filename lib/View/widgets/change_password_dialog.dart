@@ -29,7 +29,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: const Text('Đổi Mật Khẩu'),
+      title: const Text('Change Password'),
       content: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -40,7 +40,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 controller: _oldPasswordController,
                 obscureText: _obscureOld,
                 decoration: InputDecoration(
-                  labelText: 'Mật khẩu cũ',
+                  labelText: 'Old password',
                   prefixIcon: const Icon(Icons.lock_outline),
                   suffixIcon: IconButton(
                     icon: Icon(_obscureOld ? Icons.visibility : Icons.visibility_off),
@@ -49,7 +49,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập mật khẩu cũ';
+                    return 'Please enter your old password';
                   }
                   return null;
                 },
@@ -59,7 +59,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 controller: _newPasswordController,
                 obscureText: _obscureNew,
                 decoration: InputDecoration(
-                  labelText: 'Mật khẩu mới',
+                  labelText: 'New password',
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(_obscureNew ? Icons.visibility : Icons.visibility_off),
@@ -68,10 +68,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng nhập mật khẩu mới';
+                    return 'Please enter a new password';
                   }
                   if (value.length < 3) {
-                    return 'Mật khẩu phải có ít nhất 3 ký tự';
+                    return 'Password must be at least 3 characters';
                   }
                   return null;
                 },
@@ -81,7 +81,7 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 controller: _confirmPasswordController,
                 obscureText: _obscureConfirm,
                 decoration: InputDecoration(
-                  labelText: 'Xác nhận mật khẩu mới',
+                  labelText: 'Confirm new password',
                   prefixIcon: const Icon(Icons.lock),
                   suffixIcon: IconButton(
                     icon: Icon(_obscureConfirm ? Icons.visibility : Icons.visibility_off),
@@ -90,10 +90,10 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Vui lòng xác nhận mật khẩu';
+                    return 'Please confirm the password';
                   }
                   if (value != _newPasswordController.text) {
-                    return 'Mật khẩu không khớp';
+                    return 'Passwords do not match';
                   }
                   return null;
                 },
@@ -105,11 +105,11 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('Hủy'),
+          child: const Text('Cancel'),
         ),
         ElevatedButton(
           onPressed: () => _handleChangePassword(),
-          child: const Text('Đổi mật khẩu'),
+          child: const Text('Change password'),
         ),
       ],
     );
@@ -124,27 +124,27 @@ class _ChangePasswordDialogState extends State<ChangePasswordDialog> {
     final scaffoldMessenger = ScaffoldMessenger.of(context);
     final navigator = Navigator.of(context);
 
-    // Lưu giá trị
+    // Save values
     final oldPwd = _oldPasswordController.text;
     final newPwd = _newPasswordController.text;
 
-    // Đóng dialog
+    // Close dialog
     navigator.pop();
 
-    // Thực hiện đổi mật khẩu
+    // Perform password change
     final success = await authViewModel.changePassword(oldPwd, newPwd);
 
     if (success) {
       scaffoldMessenger.showSnackBar(
         const SnackBar(
-          content: Text('Đổi mật khẩu thành công!'),
+          content: Text('Password changed successfully!'),
           backgroundColor: Colors.green,
         ),
       );
     } else {
       scaffoldMessenger.showSnackBar(
         SnackBar(
-          content: Text(authViewModel.errorMessage ?? 'Đổi mật khẩu thất bại'),
+          content: Text(authViewModel.errorMessage ?? 'Password change failed'),
           backgroundColor: Colors.red,
         ),
       );

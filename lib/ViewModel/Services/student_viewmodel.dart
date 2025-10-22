@@ -44,7 +44,7 @@ class StudentViewmodel extends ChangeNotifier {
     try {
       _students = await _studentRepo.getAllStudents();
     } catch (e) {
-      debugPrint("Lỗi khi tải danh sách sinh viên: $e");
+      debugPrint("Error loading student list: $e");
     }
     notifyListeners();
   }
@@ -53,7 +53,7 @@ class StudentViewmodel extends ChangeNotifier {
     try {
       _majors = await _majorRepo.getAllMajors();
     } catch (e) {
-      debugPrint("Lỗi khi tải danh sách ngành: $e");
+      debugPrint("Error loading majors: $e");
     }
     notifyListeners();
   }
@@ -63,7 +63,7 @@ class StudentViewmodel extends ChangeNotifier {
     await fetchStudents();
   }
 
-  // --- Nganh Management ---
+  // --- Major Management ---
   Future<void> addNganh(Major nganh) async {
     await _majorRepo.insertMajor(nganh);
     await fetchMajors();
@@ -100,34 +100,34 @@ class StudentViewmodel extends ChangeNotifier {
 
     if (_pickedImage != null) {
       try {
-        // Lấy thư mục lưu trữ app
+        // Get application storage directory
         final Directory appDir = await getApplicationDocumentsDirectory();
         final String avatarsDir = path.join(appDir.path, 'avatars');
         
-        // Tạo thư mục avatars nếu chưa có
+        // Create avatars directory if not exists
         await Directory(avatarsDir).create(recursive: true);
         
-        // Tạo tên file mới: maSV_timestamp.jpg
+        // Create new file name: {maSV}_{timestamp}.jpg
         final String fileName = '${maSV}_${DateTime.now().millisecondsSinceEpoch}.jpg';
         final String newPath = path.join(avatarsDir, fileName);
         
-        // Copy file từ đường dẫn tạm sang permanent storage
+        // Copy file from temp path to permanent storage
         await _pickedImage!.copy(newPath);
         finalAvatarPath = newPath;
         
-        // Xóa ảnh cũ nếu có (để tránh lãng phí bộ nhớ)
-        if (currentAvatarPath != null && 
+        // Delete old avatar if exists (to avoid wasting storage)
+        if (currentAvatarPath != null &&
             currentAvatarPath.isNotEmpty && 
             File(currentAvatarPath).existsSync()) {
           try {
             await File(currentAvatarPath).delete();
           } catch (e) {
-            debugPrint('Không thể xóa ảnh cũ: $e');
+            debugPrint('Failed to delete old avatar: $e');
           }
         }
       } catch (e) {
-        debugPrint('Lỗi khi lưu avatar: $e');
-        // Nếu lỗi, giữ nguyên đường dẫn cũ
+        debugPrint('Error saving avatar: $e');
+        // On error, keep old path
       }
     }
 
@@ -143,10 +143,10 @@ class StudentViewmodel extends ChangeNotifier {
     if (isEditing) {
       await _studentRepo.updateStudent(sv);
     } else {
-      // Khi thêm sinh viên mới, tự động tạo tài khoản với mật khẩu "123"
+      // When adding a new student, automatically create an account with password "123"
       final success = await _authRepo.createStudentWithAccount(sv, defaultPassword: '123');
       if (!success) {
-        // Nếu tài khoản đã tồn tại, chỉ insert sinh viên
+        // If account already exists, just insert the student
         await _studentRepo.insertStudent(sv);
       }
     }
@@ -157,7 +157,7 @@ class StudentViewmodel extends ChangeNotifier {
   }
 
 
-  /// Mở Camera để chụp ảnh
+  /// Open camera to take a photo
   Future<void> pickImageFromCamera() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.camera);
@@ -166,11 +166,11 @@ class StudentViewmodel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint("Lỗi khi chụp ảnh: $e");
+      debugPrint("Error taking photo: $e");
     }
   }
 
-  /// Mở Thư viện để chọn ảnh
+  /// Open gallery to pick an image
   Future<void> pickImageFromGallery() async {
     try {
       final XFile? image = await _picker.pickImage(source: ImageSource.gallery);
@@ -179,37 +179,37 @@ class StudentViewmodel extends ChangeNotifier {
         notifyListeners();
       }
     } catch (e) {
-      debugPrint("Lỗi khi chọn ảnh từ thư viện: $e");
+      debugPrint("Error picking image from gallery: $e");
     }
   }
 
-  /// Mở Danh bạ để chọn SĐT
-  /// Hàm này trả về SĐT, View sẽ nhận và gán vào TextField
+  /// Open contacts to pick a phone number
+  /// This function returns the phone number; the View will assign it to a TextField
   Future<String?> pickContactPhone() async {
     try {
-      // Request permission trước
+      // Request permission first
       if (await FlutterContacts.requestPermission()) {
-        // Mở danh bạ để chọn contact
+        // Open contacts to pick a contact
         Contact? contact = await FlutterContacts.openExternalPick();
         
         if (contact != null) {
-          // openExternalPick() chỉ trả về contact với id và displayName
-          // Cần fetch lại contact đầy đủ để lấy số điện thoại
+          // openExternalPick() only returns contact with id and displayName
+          // Need to fetch full contact to get phone numbers
           final fullContact = await FlutterContacts.getContact(contact.id);
           
           if (fullContact != null && fullContact.phones.isNotEmpty) {
-            // Trả về số điện thoại đầu tiên
+            // Return the first phone number
             return fullContact.phones.first.number;
           }
         }
       } else {
-        debugPrint('Quyền truy cập danh bạ bị từ chối');
+        debugPrint('Contacts permission denied');
       }
     } catch (e) {
-      debugPrint('Lỗi khi chọn từ danh bạ: $e');
+      debugPrint('Error selecting from contacts: $e');
     }
 
-    // Trả về null nếu không chọn hoặc bị từ chối quyền
+    // Return null if not selected or permission denied
     return null;
   }
 

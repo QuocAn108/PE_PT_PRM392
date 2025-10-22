@@ -42,15 +42,15 @@ class _StudentDetailViewState extends State<StudentDetailView> {
       final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       
-      // Kiểm tra quyền nếu đang edit
+      // Check permission when editing
       if (_isEditing && widget.student != null) {
         _hasPermission = authViewModel.canEditStudent(widget.student!.studentId ?? '');
         if (!_hasPermission) {
-          // Không có quyền, quay lại
+          // No permission, go back
           Navigator.pop(context);
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Bạn không có quyền chỉnh sửa sinh viên này!'),
+              content: Text('You do not have permission to edit this student!'),
               backgroundColor: Colors.red,
             ),
           );
@@ -88,13 +88,13 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text('Chọn nguồn ảnh'),
+        title: const Text('Choose image source'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             ListTile(
               leading: const Icon(Icons.camera_alt),
-              title: const Text('Chụp ảnh'),
+              title: const Text('Take photo'),
               onTap: () async {
                 Navigator.pop(context);
                 await Provider.of<StudentViewmodel>(context, listen: false)
@@ -103,7 +103,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
             ),
             ListTile(
               leading: const Icon(Icons.photo_library),
-              title: const Text('Chọn từ thư viện'),
+              title: const Text('Choose from gallery'),
               onTap: () async {
                 Navigator.pop(context);
                 await Provider.of<StudentViewmodel>(context, listen: false)
@@ -131,12 +131,12 @@ class _StudentDetailViewState extends State<StudentDetailView> {
       final viewModel = Provider.of<StudentViewmodel>(context, listen: false);
       final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
       
-      // Kiểm tra quyền trước khi lưu
+      // Check permission before saving
       if (_isEditing && widget.student != null) {
         if (!authViewModel.canEditStudent(widget.student!.studentId ?? '')) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Bạn không có quyền chỉnh sửa sinh viên này!'),
+              content: Text('You do not have permission to edit this student!'),
               backgroundColor: Colors.red,
             ),
           );
@@ -161,7 +161,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(_isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!'),
+            content: Text(_isEditing ? 'Updated successfully!' : 'Added successfully!'),
             backgroundColor: Colors.green,
           ),
         );
@@ -174,7 +174,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     if (_diaChiController.text.trim().isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Vui lòng nhập địa chỉ trước khi xem bản đồ'),
+          content: Text('Please enter an address before viewing the map'),
           backgroundColor: Colors.orange,
         ),
       );
@@ -226,7 +226,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
     return Scaffold(
       appBar: AppBar(
         title: Text(
-          _isEditing ? 'Chỉnh Sửa Sinh Viên' : 'Thêm Sinh Viên',
+          _isEditing ? 'Edit Student' : 'Add Student',
           style: const TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
@@ -243,7 +243,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Đang xử lý...',
+                    'Processing...',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 16,
@@ -305,7 +305,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                   child: IconButton(
                                     icon: const Icon(Icons.camera_alt, color: Colors.white),
                                     onPressed: _showImageSourceDialog,
-                                    tooltip: 'Thay đổi ảnh',
+                                    tooltip: 'Change photo',
                                   ),
                                 ),
                               ),
@@ -332,16 +332,16 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             children: [
-                              // Thông tin cơ bản
-                              _buildSectionTitle('Thông Tin Cơ Bản', Icons.person),
+                              // Basic Information
+                              _buildSectionTitle('Basic Information', Icons.person),
                               const SizedBox(height: 16),
                               _buildFormCard([
-                                // Mã SV
+                                // Student ID
                                 TextFormField(
                                   controller: _maSVController,
                                   decoration: InputDecoration(
-                                    labelText: 'Mã Sinh Viên *',
-                                    hintText: 'Nhập mã sinh viên',
+                                    labelText: 'Student ID *',
+                                    hintText: 'Enter student ID',
                                     prefixIcon: Icon(Icons.badge, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -360,18 +360,18 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                   ),
                                   enabled: !_isEditing,
                                   validator: (value) {
-                                    if (value?.isEmpty ?? true) return 'Vui lòng nhập mã sinh viên';
+                                    if (value?.isEmpty ?? true) return 'Please enter student ID';
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Họ Tên
+                                // Full Name
                                 TextFormField(
                                   controller: _hoTenController,
                                   decoration: InputDecoration(
-                                    labelText: 'Họ và Tên *',
-                                    hintText: 'Nhập họ và tên đầy đủ',
+                                    labelText: 'Full Name *',
+                                    hintText: 'Enter full name',
                                     prefixIcon: Icon(Icons.person, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -389,18 +389,18 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                     ),
                                   ),
                                   validator: (value) {
-                                    if (value?.isEmpty ?? true) return 'Vui lòng nhập họ tên';
+                                    if (value?.isEmpty ?? true) return 'Please enter full name';
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Ngành
+                                // Major
                                 DropdownButtonFormField<String>(
                                   value: _selectedMaNganh,
                                   decoration: InputDecoration(
-                                    labelText: 'Ngành',
-                                    hintText: 'Chọn ngành học',
+                                    labelText: 'Major',
+                                    hintText: 'Select major',
                                     prefixIcon: Icon(Icons.school, color: AppColors.primaryLight),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -435,21 +435,21 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                               
                               const SizedBox(height: 24),
                               
-                              // Thông tin liên hệ
-                              _buildSectionTitle('Thông Tin Liên Hệ', Icons.contact_phone),
+                              // Contact Information
+                              _buildSectionTitle('Contact Information', Icons.contact_phone),
                               const SizedBox(height: 16),
                               _buildFormCard([
-                                // Địa chỉ with Map button
+                                // Address with Map button
                                 TextFormField(
                                   controller: _diaChiController,
                                   decoration: InputDecoration(
-                                    labelText: 'Địa Chỉ',
-                                    hintText: 'Nhập địa chỉ',
+                                    labelText: 'Address',
+                                    hintText: 'Enter address',
                                     prefixIcon: Icon(Icons.home, color: Colors.green.shade400),
                                     suffixIcon: IconButton(
                                       icon: Icon(Icons.map, color: Colors.green.shade400),
                                       onPressed: _showMapView,
-                                      tooltip: 'Xem trên bản đồ',
+                                      tooltip: 'View on map',
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -470,17 +470,17 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                 ),
                                 const SizedBox(height: 16),
 
-                                // Số điện thoại with Contact picker
+                                // Phone Number with Contact picker
                                 TextFormField(
                                   controller: _soDTController,
                                   decoration: InputDecoration(
-                                    labelText: 'Số Điện Thoại',
-                                    hintText: 'Nhập số điện thoại',
+                                    labelText: 'Phone Number',
+                                    hintText: 'Enter phone number',
                                     prefixIcon: Icon(Icons.phone, color: Colors.orange.shade400),
                                     suffixIcon: IconButton(
                                       icon: Icon(Icons.contacts, color: Colors.orange.shade400),
                                       onPressed: _pickContactPhone,
-                                      tooltip: 'Chọn từ danh bạ',
+                                      tooltip: 'Pick from contacts',
                                     ),
                                     filled: true,
                                     fillColor: Colors.white,
@@ -508,7 +508,7 @@ class _StudentDetailViewState extends State<StudentDetailView> {
                                 onPressed: _saveStudent,
                                 icon: const Icon(Icons.save, color: Colors.white),
                                 label: Text(
-                                  _isEditing ? 'Cập Nhật Thông Tin' : 'Thêm Sinh Viên',
+                                  _isEditing ? 'Update Information' : 'Add Student',
                                   style: const TextStyle(
                                     fontSize: 16,
                                     fontWeight: FontWeight.bold,

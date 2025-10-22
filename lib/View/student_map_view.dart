@@ -23,11 +23,11 @@ class _StudentMapViewState extends State<StudentMapView> {
   String _selectedMapStyle = 'standard';
   final Map<String, Map<String, String>> _mapStyles = {
     'standard': {
-      'name': 'Tiêu chuẩn',
+      'name': 'Standard',
       'url': 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
     },
     'satellite': {
-      'name': 'Vệ tinh',
+      'name': 'Satellite',
       'url': 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
     }
   };
@@ -63,13 +63,13 @@ class _StudentMapViewState extends State<StudentMapView> {
         });
       } else {
         setState(() {
-          _errorMessage = 'Không tìm thấy vị trí cho địa chỉ này';
+          _errorMessage = 'Location not found for this address';
           _isLoading = false;
         });
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Không thể tìm kiếm địa chỉ: ${e.toString()}';
+        _errorMessage = 'Unable to search address: ${e.toString()}';
         _isLoading = false;
       });
     }
@@ -103,7 +103,7 @@ class _StudentMapViewState extends State<StudentMapView> {
       backgroundColor: Colors.grey.shade100,
       appBar: AppBar(
         title: const Text(
-          'Vị Trí Sinh Viên',
+          'Student Location',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
@@ -112,7 +112,7 @@ class _StudentMapViewState extends State<StudentMapView> {
           if (!_isLoading && _errorMessage == null)
             PopupMenuButton<String>(
               icon: const Icon(Icons.layers),
-              tooltip: 'Chọn kiểu bản đồ',
+              tooltip: 'Choose map style',
               onSelected: (value) {
                 setState(() {
                   _selectedMapStyle = value;
@@ -163,7 +163,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'Đang tìm kiếm vị trí...',
+                    'Searching for location...',
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.w500,
@@ -203,7 +203,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                         ),
                         const SizedBox(height: 24),
                         Text(
-                          'Không thể tìm thấy vị trí',
+                          'Location not found',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.bold,
@@ -224,7 +224,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                           onPressed: _geocodeAddress,
                           icon: const Icon(Icons.refresh, color: Colors.white),
                           label: const Text(
-                            'Thử lại',
+                            'Retry',
                             style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
@@ -248,7 +248,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                 )
               : _studentLocation == null
                   ? const Center(
-                      child: Text('Không tìm thấy vị trí'),
+                      child: Text('Location not found'),
                     )
                   : Stack(
                       children: [
@@ -324,7 +324,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                                             ),
                                             const SizedBox(width: 4),
                                             const Text(
-                                              'Sinh viên',
+                                              'Student',
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 fontWeight: FontWeight.bold,
@@ -415,7 +415,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                                         const SizedBox(width: 12),
                                         const Expanded(
                                           child: Text(
-                                            'Địa chỉ',
+                                            'Address',
                                             style: TextStyle(
                                               fontWeight: FontWeight.bold,
                                               fontSize: 16,
@@ -496,13 +496,13 @@ class _StudentMapViewState extends State<StudentMapView> {
                               _buildControlButton(
                                 icon: Icons.add,
                                 onPressed: _zoomIn,
-                                tooltip: 'Phóng to',
+                                tooltip: 'Zoom in',
                               ),
                               const SizedBox(height: 8),
                               _buildControlButton(
                                 icon: Icons.remove,
                                 onPressed: _zoomOut,
-                                tooltip: 'Thu nhỏ',
+                                tooltip: 'Zoom out',
                               ),
                             ],
                           ),
@@ -515,7 +515,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                           child: _buildControlButton(
                             icon: Icons.my_location,
                             onPressed: _recenterMap,
-                            tooltip: 'Về trung tâm',
+                            tooltip: 'Recenter',
                             color: AppColors.primary,
                           ),
                         ),
@@ -532,7 +532,7 @@ class _StudentMapViewState extends State<StudentMapView> {
                                   _showInfo = true;
                                 });
                               },
-                              tooltip: 'Hiện thông tin',
+                              tooltip: 'Show info',
                             ),
                           ),
                       ],

@@ -31,7 +31,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: Text(isEditing ? 'Chỉnh Sửa Ngành' : 'Thêm Ngành Mới'),
+          title: Text(isEditing ? 'Edit Major' : 'Add New Major'),
           content: Form(
             key: formKey,
             child: Column(
@@ -40,15 +40,15 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                 TextFormField(
                   controller: maNganhController,
                   decoration: InputDecoration(
-                    labelText: 'Mã Ngành',
+                    labelText: 'Major ID',
                     prefixIcon: const Icon(Icons.code),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
-                  enabled: !isEditing, // Không cho sửa mã khi edit
+                  enabled: !isEditing, // Do not allow editing ID when editing
                   validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Vui lòng nhập mã ngành';
+                    if (value?.isEmpty ?? true) return 'Please enter major ID';
                     return null;
                   },
                 ),
@@ -56,14 +56,14 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                 TextFormField(
                   controller: tenNganhController,
                   decoration: InputDecoration(
-                    labelText: 'Tên Ngành',
+                    labelText: 'Major Name',
                     prefixIcon: const Icon(Icons.school),
                     border: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                     ),
                   ),
                   validator: (value) {
-                    if (value?.isEmpty ?? true) return 'Vui lòng nhập tên ngành';
+                    if (value?.isEmpty ?? true) return 'Please enter major name';
                     return null;
                   },
                 ),
@@ -73,7 +73,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -97,21 +97,21 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                     navigator.pop();
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
-                        content: Text(isEditing ? 'Cập nhật thành công!' : 'Thêm mới thành công!'),
+                        content: Text(isEditing ? 'Updated successfully!' : 'Added successfully!'),
                         backgroundColor: Colors.green,
                       ),
                     );
                   } catch (e) {
                     scaffoldMessenger.showSnackBar(
                       SnackBar(
-                        content: Text('Lỗi: $e'),
+                        content: Text('Error: $e'),
                         backgroundColor: Colors.red,
                       ),
                     );
                   }
                 }
               },
-              child: Text(isEditing ? 'Cập Nhật' : 'Thêm'),
+              child: Text(isEditing ? 'Update' : 'Add'),
             ),
           ],
         );
@@ -124,12 +124,12 @@ class _MajorManagementViewState extends State<MajorManagementView> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Xác Nhận Xóa'),
-          content: Text('Bạn có chắc chắn muốn xóa ngành "${major.name}"?\n\nLưu ý: Các sinh viên thuộc ngành này sẽ có MaNganh = NULL.'),
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete major "${major.name}"?\n\nNote: Students belonging to this major will have their major set to NULL.'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -142,7 +142,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                 navigator.pop();
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Xóa thành công!'),
+                    content: Text('Deleted successfully!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -150,7 +150,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
               ),
-              child: const Text('Xóa'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -165,7 +165,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(isAdmin ? 'Quản Lý Ngành' : 'Danh Sách Ngành'),
+        title: Text(isAdmin ? 'Manage Majors' : 'Major List'),
         elevation: 0,
       ),
       body: Consumer<StudentViewmodel>(
@@ -186,7 +186,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Chưa có ngành nào',
+                    'No majors yet',
                     style: TextStyle(
                       fontSize: 18,
                       color: Colors.grey.shade600,
@@ -197,7 +197,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                     ElevatedButton.icon(
                       onPressed: () => _showAddEditDialog(),
                       icon: const Icon(Icons.add),
-                      label: const Text('Thêm Ngành Đầu Tiên'),
+                      label: const Text('Add First Major'),
                     ),
                   ],
                 ],
@@ -237,7 +237,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                     ),
                   ),
                   subtitle: Text(
-                    'Mã: ${major.id}',
+                    'Code: ${major.id}',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                     ),
@@ -249,12 +249,12 @@ class _MajorManagementViewState extends State<MajorManagementView> {
                             IconButton(
                               icon: const Icon(Icons.edit, color: Colors.blue),
                               onPressed: () => _showAddEditDialog(nganh: major),
-                              tooltip: 'Chỉnh sửa',
+                              tooltip: 'Edit',
                             ),
                             IconButton(
                               icon: const Icon(Icons.delete, color: Colors.red),
                               onPressed: () => _confirmDelete(major),
-                              tooltip: 'Xóa',
+                              tooltip: 'Delete',
                             ),
                           ],
                         )
@@ -269,7 +269,7 @@ class _MajorManagementViewState extends State<MajorManagementView> {
           ? FloatingActionButton.extended(
               onPressed: () => _showAddEditDialog(),
               icon: const Icon(Icons.add),
-              label: const Text('Thêm Ngành'),
+              label: const Text('Add Major'),
               backgroundColor: AppColors.primary,
             )
           : null,

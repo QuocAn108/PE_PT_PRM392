@@ -141,7 +141,7 @@ class StudentCard extends StatelessWidget {
                     child: IconButton(
                       icon: Icon(Icons.delete_outline, color: Colors.red.shade400),
                       onPressed: onDelete,
-                      tooltip: 'Xóa sinh viên',
+                      tooltip: 'Delete student',
                     ),
                   ),
                 

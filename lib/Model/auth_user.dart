@@ -10,7 +10,7 @@ class AuthUser {
     required this.role,
   });
 
-  // Các getter tiện dụng
+  // Convenient getters
   String? get studentId => student.id;
   String get fullName => student.fullName;
   String? get avatarPath => student.avatarPath;
@@ -19,4 +19,3 @@ class AuthUser {
   bool get isAdmin => role == UserRole.admin;
   bool get isStudent => role == UserRole.student;
 }
-

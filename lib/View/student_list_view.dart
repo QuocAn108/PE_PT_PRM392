@@ -53,11 +53,11 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
   void _confirmDeleteStudent(String maSV, String hoTen) {
     final authViewModel = Provider.of<AuthViewModel>(context, listen: false);
     
-    // Kiểm tra quyền trước khi xóa - CHỈ ADMIN
+    // Check permission before deleting - ONLY ADMIN
     if (!authViewModel.canDeleteStudent(maSV)) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text('Chỉ Admin mới có quyền xóa sinh viên!'),
+          content: Text('Only admins can delete students!'),
           backgroundColor: Colors.red,
         ),
       );
@@ -68,12 +68,12 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Xác Nhận Xóa'),
-          content: Text('Bạn có chắc chắn muốn xóa sinh viên "$hoTen"?'),
+          title: const Text('Confirm Delete'),
+          content: Text('Are you sure you want to delete student "${hoTen}"?'),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -86,7 +86,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 navigator.pop();
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Xóa sinh viên thành công!'),
+                    content: Text('Student deleted successfully!'),
                     backgroundColor: Colors.green,
                   ),
                 );
@@ -94,7 +94,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
               ),
-              child: const Text('Xóa'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -114,7 +114,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             children: [
               const Icon(Icons.settings, color: AppColors.primary),
               const SizedBox(width: 8),
-              const Text('Cài Đặt Tài Khoản'),
+              const Text('Account Settings'),
             ],
           ),
           content: Column(
@@ -131,14 +131,14 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                   currentUser?.full_name ?? 'N/A',
                   style: const TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text('Mã SV: ${currentUser?.studentId ?? 'N/A'}'),
+                subtitle: Text('ID: ${currentUser?.studentId ?? 'N/A'}'),
               ),
               const Divider(),
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.edit, color: AppColors.primary),
-                title: const Text('Chỉnh sửa thông tin'),
-                subtitle: const Text('Cập nhật ảnh đại diện, số điện thoại,...'),
+                title: const Text('Edit profile'),
+                subtitle: const Text('Update avatar, phone number, ...'),
                 onTap: () {
                   Navigator.pop(dialogContext);
                   _editProfile();
@@ -147,8 +147,8 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.lock, color: Colors.orange),
-                title: const Text('Đổi mật khẩu'),
-                subtitle: const Text('Thay đổi mật khẩu đăng nhập'),
+                title: const Text('Change password'),
+                subtitle: const Text('Change account password'),
                 onTap: () {
                   Navigator.pop(dialogContext);
                   _showChangePasswordDialog();
@@ -158,9 +158,9 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               ListTile(
                 contentPadding: EdgeInsets.zero,
                 leading: const Icon(Icons.delete_forever, color: Colors.red),
-                title: const Text('Xóa tài khoản', style: TextStyle(color: Colors.red)),
+                title: const Text('Delete account', style: TextStyle(color: Colors.red)),
                 subtitle: const Text(
-                  'Xóa vĩnh viễn thông tin và tài khoản',
+                  'Permanently delete account and data',
                   style: TextStyle(fontSize: 11),
                 ),
                 onTap: () {
@@ -173,7 +173,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Đóng'),
+              child: const Text('Close'),
             ),
           ],
         );
@@ -200,10 +200,10 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
         ),
       );
       
-      // Làm mới thông tin user sau khi chỉnh sửa
+      // Refresh user info after editing
       await authViewModel.refreshCurrentUser();
       
-      // Làm mới danh sách sinh viên
+      // Refresh student list
       if (mounted) {
         Provider.of<StudentViewmodel>(context, listen: false).loadAllData();
       }
@@ -215,14 +215,14 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          title: const Text('Xác Nhận Xóa Tài Khoản'),
+          title: const Text('Confirm Account Deletion'),
           content: const Text(
-            'Bạn có chắc chắn muốn xóa tài khoản của mình?\n\nHành động này không thể hoàn tác!',
+            'Are you sure you want to delete your account?\n\nThis action cannot be undone!',
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext),
-              child: const Text('Hủy'),
+              child: const Text('Cancel'),
             ),
             ElevatedButton(
               onPressed: () async {
@@ -235,7 +235,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                 navigator.pop();
                 scaffoldMessenger.showSnackBar(
                   const SnackBar(
-                    content: Text('Tài khoản đã bị xóa'),
+                    content: Text('Account deleted'),
                     backgroundColor: Colors.orange,
                   ),
                 );
@@ -243,7 +243,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.red,
               ),
-              child: const Text('Xóa'),
+              child: const Text('Delete'),
             ),
           ],
         );
@@ -260,7 +260,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          "Danh Sách Sinh Viên",
+          "Student List",
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         elevation: 0,
@@ -271,7 +271,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             onPressed: () {
               authViewModel.logout();
             },
-            tooltip: 'Đăng xuất',
+            tooltip: 'Logout',
           ),
         ],
       ),
@@ -283,7 +283,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
               decoration: BoxDecoration(
                 color: AppColors.primaryDark,
               ),
-              accountName: Text(currentUser?.full_name ?? 'Người dùng'),
+              accountName: Text(currentUser?.full_name ?? 'User'),
               accountEmail: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -314,14 +314,14 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             ),
             ListTile(
               leading: const Icon(Icons.home),
-              title: const Text('Trang chủ'),
+              title: const Text('Home'),
               onTap: () {
                 Navigator.pop(context);
               },
             ),
             ListTile(
               leading: const Icon(Icons.school),
-              title: Text(isAdmin ? 'Quản lý Ngành' : 'Danh sách Ngành'),
+              title: Text(isAdmin ? 'Manage Majors' : 'Major List'),
               onTap: () {
                 Navigator.pop(context);
                 Navigator.push(
@@ -335,7 +335,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             const Divider(),
             ListTile(
               leading: const Icon(Icons.settings),
-              title: const Text('Cài đặt tài khoản'),
+              title: const Text('Account Settings'),
               onTap: () {
                 Navigator.pop(context);
                 _showAccountSettings();
@@ -343,7 +343,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             ),
             ListTile(
               leading: const Icon(Icons.logout, color: Colors.red),
-              title: const Text('Đăng xuất', style: TextStyle(color: Colors.red)),
+              title: const Text('Logout', style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.pop(context);
                 authViewModel.logout();
@@ -365,7 +365,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Đang tải dữ liệu...',
+                    'Loading data...',
                     style: TextStyle(
                       color: Colors.grey.shade600,
                       fontSize: 16,
@@ -379,8 +379,8 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
           if (studentViewModel.students.isEmpty) {
             return EmptyState(
               icon: Icons.people_outline,
-              title: 'Chưa có sinh viên nào',
-              subtitle: 'Hãy thêm sinh viên đầu tiên',
+              title: 'No students yet',
+              subtitle: 'Add the first student',
               iconColor: AppColors.primaryLight,
               action: ElevatedButton.icon(
                 onPressed: () {
@@ -392,7 +392,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                   ).then((_) => studentViewModel.loadAllData());
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Thêm Sinh Viên'),
+                label: const Text('Add Student'),
                 style: ElevatedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                   shape: RoundedRectangleBorder(
@@ -403,12 +403,12 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
             );
           }
 
-          // Lọc bỏ ADMIN khỏi danh sách hiển thị
+          // Filter out ADMIN from display list
           var displayStudents = studentViewModel.students
               .where((student) => student.studentId != 'ADMIN')
               .toList();
           
-          // Áp dụng search filter
+          // Apply search filter
           if (_searchQuery.isNotEmpty) {
             displayStudents = displayStudents.where((student) {
               final query = _searchQuery.toLowerCase();
@@ -442,7 +442,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                     });
                   },
                   decoration: InputDecoration(
-                    hintText: 'Tìm kiếm theo tên, mã SV, SĐT...',
+                    hintText: 'Search by name, ID, phone...',
                     hintStyle: TextStyle(color: Colors.grey.shade400),
                     prefixIcon: Icon(Icons.search, color: AppColors.primaryLight),
                     suffixIcon: _searchQuery.isNotEmpty
@@ -471,12 +471,12 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                     ? EmptyState(
                         icon: _searchQuery.isNotEmpty ? Icons.search_off : Icons.people_outline,
                         title: _searchQuery.isNotEmpty 
-                            ? 'Không tìm thấy sinh viên'
-                            : 'Chưa có sinh viên nào',
+                            ? 'No students found'
+                            : 'No students yet',
                         subtitle: _searchQuery.isNotEmpty
-                            ? 'Thử tìm kiếm với từ khóa khác'
-                            : 'Hãy thêm sinh viên đầu tiên',
-                        iconColor: _searchQuery.isNotEmpty 
+                            ? 'Try searching with different keywords'
+                            : 'Add the first student',
+                        iconColor: _searchQuery.isNotEmpty
                             ? Colors.orange.shade300
                             : AppColors.primaryLight,
                         action: (isAdmin && _searchQuery.isEmpty)
@@ -490,7 +490,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                                   ).then((_) => studentViewModel.loadAllData());
                                 },
                                 icon: const Icon(Icons.add),
-                                label: const Text('Thêm Sinh Viên'),
+                                label: const Text('Add Student'),
                                 style: ElevatedButton.styleFrom(
                                   padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
                                   shape: RoundedRectangleBorder(
@@ -541,7 +541,7 @@ class _StudentListViewState extends State<StudentListView> with SingleTickerProv
                   });
                 },
                 icon: const Icon(Icons.add),
-                label: const Text('Thêm Sinh Viên'),
+                label: const Text('Add Student'),
                 elevation: 8,
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(30),

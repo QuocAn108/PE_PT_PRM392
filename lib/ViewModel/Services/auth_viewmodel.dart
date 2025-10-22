@@ -29,9 +29,9 @@ class AuthViewModel extends ChangeNotifier {
     try {
       final user = await _authRepository.login(username, password);
       if (user != null) {
-        // Kiểm tra quyền đăng nhập: chỉ admin mới được đăng nhập
+        // Check login permission: only admin can log in
         if (user.role == UserRole.student) {
-          _errorMessage = "Không có quyền đăng nhập";
+          _errorMessage = "No login permission";
           _isLoading = false;
           notifyListeners();
           return false;
@@ -41,13 +41,13 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _errorMessage = "Sai tên đăng nhập hoặc mật khẩu";
+        _errorMessage = "Invalid username or password";
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = "Đã xảy ra lỗi: $e";
+      _errorMessage = "An error occurred: $e";
       _isLoading = false;
       notifyListeners();
       return false;
@@ -66,13 +66,13 @@ class AuthViewModel extends ChangeNotifier {
         notifyListeners();
         return true;
       } else {
-        _errorMessage = "Tên đăng nhập (MaSV) đã tồn tại";
+        _errorMessage = "Username (MaSV) already exists";
         _isLoading = false;
         notifyListeners();
         return false;
       }
     } catch (e) {
-      _errorMessage = "Đã xảy ra lỗi: $e";
+      _errorMessage = "An error occurred: $e";
       _isLoading = false;
       notifyListeners();
       return false;
@@ -97,7 +97,7 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Làm mới thông tin user hiện tại sau khi cập nhật
+  /// Refresh current user info after update
   Future<void> refreshCurrentUser() async {
     if (_loggedInUser != null) {
       try {
@@ -112,24 +112,24 @@ class AuthViewModel extends ChangeNotifier {
     }
   }
 
-  /// Kiểm tra xem user hiện tại có quyền edit sinh viên này không
+  /// Check if the current user can edit this student
   bool canEditStudent(String maSV) {
     if (_loggedInUser == null) return false;
-    // Admin có thể sửa tất cả
+    // Admin can edit all
     if (_loggedInUser!.isAdmin) return true;
-    // Sinh viên chỉ được sửa chính mình
+    // Student can only edit themselves
     return _loggedInUser!.student.id == maSV;
   }
 
-  /// Kiểm tra xem user hiện tại có quyền xóa sinh viên này không
-  /// CHỈ ADMIN mới có quyền xóa
+  /// Check if current user can delete this student
+  /// ONLY ADMIN can delete
   bool canDeleteStudent(String maSV) {
     if (_loggedInUser == null) return false;
-    // Chỉ Admin mới được xóa
+    // Only Admin can delete
     return _loggedInUser!.isAdmin;
   }
 
-  /// Đổi mật khẩu cho user hiện tại
+  /// Change password for current user
   Future<bool> changePassword(String oldPassword, String newPassword) async {
     if (_loggedInUser == null) return false;
 
@@ -147,21 +147,21 @@ class AuthViewModel extends ChangeNotifier {
       if (success) {
         _errorMessage = null;
       } else {
-        _errorMessage = "Mật khẩu cũ không đúng";
+        _errorMessage = "Old password is incorrect";
       }
 
       _isLoading = false;
       notifyListeners();
       return success;
     } catch (e) {
-      _errorMessage = "Đã xảy ra lỗi: $e";
+      _errorMessage = "An error occurred: $e";
       _isLoading = false;
       notifyListeners();
       return false;
     }
   }
 
-  /// Kiểm tra xem sinh viên có phải admin không
+  /// Check if a student is admin
   Future<bool> isStudentAdmin(String maSV) async {
     return await _authRepository.isStudentAdmin(maSV);
   }

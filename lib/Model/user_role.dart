@@ -2,7 +2,7 @@ enum UserRole {
   admin,
   student;
 
-  // Chuyển từ String -> Enum
+  // Convert from String -> Enum
   static UserRole fromString(String role) {
     switch (role.toLowerCase()) {
       case 'admin':
@@ -10,11 +10,11 @@ enum UserRole {
       case 'student':
         return UserRole.student;
       default:
-        return UserRole.student; // Default là sinh viên
+        return UserRole.student; // Default is student
     }
   }
 
-  // Chuyển từ Enum -> String (để lưu vào DB)
+  // Convert from Enum -> String (to store in DB)
   String toDbString() {
     switch (this) {
       case UserRole.admin:
@@ -24,14 +24,13 @@ enum UserRole {
     }
   }
 
-  // Hiển thị tên tiếng Việt
+  // Display name in English
   String get displayName {
     switch (this) {
       case UserRole.admin:
-        return 'Quản Trị Viên';
+        return 'Administrator';
       case UserRole.student:
-        return 'Sinh Viên';
+        return 'Student';
     }
   }
 }
-

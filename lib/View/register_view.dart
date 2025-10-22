@@ -66,7 +66,7 @@ class _RegisterViewState extends State<RegisterView> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
-              content: Text('Đăng ký thành công! Vui lòng đăng nhập.'),
+              content: Text('Registration successful! Please log in.'),
               backgroundColor: Colors.green,
             ),
           );
@@ -74,7 +74,7 @@ class _RegisterViewState extends State<RegisterView> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text(authViewModel.errorMessage ?? 'Đăng ký thất bại'),
+              content: Text(authViewModel.errorMessage ?? 'Registration failed'),
               backgroundColor: Colors.red,
             ),
           );
@@ -147,7 +147,7 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         const SizedBox(height: 16),
                         
-                        // Họ Tên
+                        // Full Name
                         TextFormField(
                           controller: _hoTenController,
                           decoration: InputDecoration(
@@ -244,7 +244,7 @@ class _RegisterViewState extends State<RegisterView> {
                         ),
                         const SizedBox(height: 24),
                         
-                        // Nút đăng ký
+                        // Register button
                         if (isLoading)
                           const CircularProgressIndicator()
                         else
@@ -267,7 +267,7 @@ class _RegisterViewState extends State<RegisterView> {
                           ),
                         const SizedBox(height: 16),
                         
-                        // Link đăng nhập
+                        // Login link
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

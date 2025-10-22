@@ -13,19 +13,19 @@ class AuthWrapper extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Dùng Consumer để lắng nghe trạng thái đăng nhập
+    // Use Consumer to listen for login state
     return Consumer<AuthViewModel>(
       builder: (context, authViewModel, child) {
         if (authViewModel.isLoggedIn) {
-          // Nếu là admin, vào màn hình danh sách sinh viên
+          // If admin, show student list screen
           if (authViewModel.currentRole == UserRole.admin) {
             return const StudentListView();
           } else {
-            // Nếu là sinh viên, vào màn hình chi tiết của chính mình
+            // If student, show their own detail screen
             return StudentDetailView(student: authViewModel.currentSinhvien);
           }
         } else {
-          // Nếu chưa, hiển thị màn hình đăng nhập
+          // If not logged in, show the login screen
           return const LoginView();
         }
       },

@@ -9,8 +9,8 @@ class AuthRepository {
   final AccountDao _accountDao = AccountDao();
   final StudentDao _studentDao = StudentDao();
 
-  /// Xử lý logic Đăng nhập
-  /// Trả về thông tin AuthUser (bao gồm Student và Role) nếu đăng nhập thành công
+  /// Handle login logic
+  /// Returns AuthUser (includes Student and Role) if login succeeds
   Future<AuthUser?> login(String username, String password) async {
     final account = await _accountDao.getById(username);
     if (account != null && account.password == password) {
@@ -31,7 +31,7 @@ class AuthRepository {
       return false;
     }
 
-    // Tạo tài khoản với role mặc định là student
+    // Create account with default role = student
     Account newAccount = Account(
       username: student.id!,
       password: password,
@@ -46,11 +46,11 @@ class AuthRepository {
   }
 
   Future<void> deleteAccount(String username) async {
-    // Xóa account trước, do cascade sẽ xóa student nếu cần
+    // Delete account first; cascade may delete student if configured
     await _accountDao.delete(username);
   }
 
-  /// Lấy thông tin user theo studentId để refresh data
+  /// Get user info by studentId to refresh data
   Future<AuthUser?> getUserByStudentId(String studentId) async {
     final account = await _accountDao.getById(studentId);
     if (account != null) {
@@ -65,15 +65,15 @@ class AuthRepository {
     return null;
   }
 
-  /// Tạo sinh viên mới kèm tài khoản với mật khẩu mặc định
-  /// Được sử dụng khi Admin tạo sinh viên mới
+  /// Create a new student with an account using a default password
+  /// Used when Admin creates a new student
   Future<bool> createStudentWithAccount(Student student, {String defaultPassword = '123'}) async {
     final existingAccount = await _accountDao.getById(student.id!);
     if (existingAccount != null) {
-      return false; // Tài khoản đã tồn tại
+      return false; // Account already exists
     }
 
-    // Tạo tài khoản với role mặc định là student
+    // Create account with default role = student
     Account newAccount = Account(
       username: student.id!,
       password: defaultPassword,
@@ -81,23 +81,23 @@ class AuthRepository {
       role: 'student',
     );
 
-    // Insert student trước
+    // Insert student first
     await _studentDao.insert(student);
-    // Sau đó insert account
+    // Then insert account
     await _accountDao.insert(newAccount);
 
     return true;
   }
 
-  /// Đổi mật khẩu cho user hiện tại
+  /// Change password for the current user
   Future<bool> changePassword(String username, String oldPassword, String newPassword) async {
-    // Kiểm tra mật khẩu cũ
+    // Check old password
     final account = await _accountDao.getById(username);
     if (account == null || account.password != oldPassword) {
-      return false; // Mật khẩu cũ không đúng
+      return false; // Old password incorrect
     }
 
-    // Cập nhật mật khẩu mới
+    // Update with new password
     Account updatedAccount = Account(
       username: username,
       password: newPassword,
@@ -109,7 +109,7 @@ class AuthRepository {
     return true;
   }
 
-  /// Kiểm tra xem sinh viên có phải admin không
+  /// Check if a student is admin
   Future<bool> isStudentAdmin(String maSV) async {
     if (maSV.isEmpty) return false;
     try {
