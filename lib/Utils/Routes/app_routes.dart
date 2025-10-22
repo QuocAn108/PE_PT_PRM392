@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:student_management/View/home_view.dart';
+import 'package:student_management/View/auth_wrapper.dart';
 import 'package:student_management/View/login_view.dart';
-import 'package:student_management/View/student_management_view.dart';
+import 'package:student_management/View/student_list_view.dart';
 import 'package:student_management/View/major_management_view.dart';
 
 class AppRoutes {
@@ -13,8 +13,8 @@ class AppRoutes {
   static Map<String, WidgetBuilder> getRoutes() {
     return {
       login: (context) => const LoginView(),
-      home: (context) => const HomeView(),
-      studentManage: (context) => const StudentManagementView(),
+      home: (context) => const AuthWrapper(),
+      studentManage: (context) => const StudentListView(),
       majorManage: (context) => const MajorManagementView(),
     };
   }
@@ -24,9 +24,9 @@ class AppRoutes {
       case login:
         return MaterialPageRoute(builder: (_) => const LoginView());
       case home:
-        return MaterialPageRoute(builder: (_) => const HomeView());
+        return MaterialPageRoute(builder: (_) => const AuthWrapper());
       case studentManage:
-        return MaterialPageRoute(builder: (_) => const StudentManagementView());
+        return MaterialPageRoute(builder: (_) => const StudentListView());
       case majorManage:
         return MaterialPageRoute(builder: (_) => const MajorManagementView());
       default:

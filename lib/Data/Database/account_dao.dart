@@ -3,14 +3,14 @@ import 'package:student_management/Model/account.dart';
 import 'package:student_management/Data/Database/base_dao.dart';
 import 'package:student_management/Data/Database/student_management_database.dart';
 
-class AccountDao extends BaseDao<Account, int> {
+class AccountDao extends BaseDao<Account, String> {
   final StudentManagementDatabase _database = StudentManagementDatabase();
 
   @override
   String get tableName => 'Account';
 
   @override
-  String get primaryKey => 'AccountID';
+  String get primaryKey => 'Username';
 
   @override
   Future<Database> get database => _database.database;

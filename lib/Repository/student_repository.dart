@@ -10,12 +10,10 @@ class StudentRepository {
     final studentWithId = Student(
       id: id,
       fullName: student.fullName,
-      majorID: student.majorID,
+      majorId: student.majorId,
       address: student.address,
       phoneNumber: student.phoneNumber,
-      avatarURL: student.avatarURL,
-      latitude: student.latitude,
-      longitude: student.longitude,
+      avatarPath: student.avatarPath,
     );
     await _dao.insert(studentWithId);
     return id;
@@ -36,5 +34,10 @@ class StudentRepository {
 
   Future<int> deleteStudent(String id) async {
     return await _dao.delete(id);
+  }
+
+  // Clear MajorId for students that reference the provided majorId.
+  Future<int> clearMajorReferences(String majorId) async {
+    return await _dao.clearMajorFromStudents(majorId);
   }
 }

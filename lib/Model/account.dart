@@ -1,39 +1,34 @@
-import 'package:student_management/Model/base_model.dart';
+import '../Model/base_model.dart';
 
 class Account extends BaseModel {
-  final int accountID;
   final String username;
-  final String passwordHash;
-  final int studentID;
-  final String? role; // new column: Role TEXT
+  final String password;
+  final String studentId;
+  final String role;
 
   Account({
-    required this.accountID,
     required this.username,
-    required this.passwordHash,
-    required this.studentID,
-    this.role,
+    required this.password,
+    required this.studentId,
+    this.role = 'student',
   });
 
   @override
   Map<String, dynamic> toJson() {
-    final Map<String, dynamic> map = {
-      'AccountID': accountID,
+    return {
       'Username': username,
-      'PasswordHash': passwordHash,
-      'StudentID': studentID,
+      'Password': password,
+      'StudentId': studentId,
+      'Role': role,
     };
-    if (role != null) map['Role'] = role;
-    return map;
   }
 
   factory Account.fromJson(Map<String, dynamic> json) {
     return Account(
-      accountID: json['AccountID'],
-      username: json['Username'],
-      passwordHash: json['PasswordHash'],
-      studentID: json['StudentID'],
-      role: json['Role'],
+      username: json['Username'].toString(),
+      password: json['Password'],
+      studentId: json['StudentId'].toString(),
+      role: json['Role'] ?? 'student',
     );
   }
 }

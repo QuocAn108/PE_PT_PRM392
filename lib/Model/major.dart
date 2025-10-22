@@ -2,29 +2,29 @@ import '../Model/base_model.dart';
 
 class Major extends BaseModel {
   final String id;
-  final String majorName;
-  final String? description;
+  final String name;
 
   Major({
     required this.id,
-    required this.majorName,
-    this.description,
+    required this.name,
   });
+
+  // Compatibility getters
+  String get majorId => id;
+  String get majorName => name;
 
   @override
   Map<String, dynamic> toJson() {
     return {
       'Id': id,
-      'MajorName': majorName,
-      'Description': description,
+      'Name': name,
     };
   }
 
   factory Major.fromJson(Map<String, dynamic> json) {
     return Major(
-      id: json['Id'],
-      majorName: json['MajorName'],
-      description: json['Description'],
+      id: json['Id'].toString(),
+      name: json['Name'],
     );
   }
 }
